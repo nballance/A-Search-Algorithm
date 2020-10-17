@@ -1,29 +1,10 @@
 from random import *
+import math
 
 grid = []
-
-def make_grid(rows, cols):
-    for r in range (rows):
-        for c in range(cols):
-            grid[r][c] = Cell(r, c, '0', -1, -1, -1)
-
-def make_hard():
-    x = 0
-    y = 0
-    for i in range(8):
-        x = randint(0, 159)
-        y = randint(0, 119)
-        for j in range(31*31):
-            
-def make_highway():
-    cell_count = 0
-    river_count = 0
-    done = False
-    for i in range(4):
-        cell_count = 0
-        
-
-    return True
+ROWS = 120
+COLS = 160
+TOTAL_BLOCKED = 3840
 
 
 class Cell:
@@ -34,24 +15,213 @@ class Cell:
         self.g_cost = g_cost
         self.h_cost = h_cost
         self.f_cost = f_cost
+
+#TODO: Needed to implement make__
+def distance(x_1, y_1, x_2, y_2):
+    #Method to find the distance from one cell to another cell
+    print() 
+  
         
+def make_grid(ROWS, COLS):
+    for r in range (ROWS):
+        for c in range(COLS):
+            grid[r][c] = Cell(r, c, '0', -1, -1, -1)
+
+def make_hard():
+    x_hard = 0
+    y_hard = 0
+    for i in range(8):
+        x_hard = randint(0, 159)
+        y_hard = randint(0, 119)
+
+        #Four Quadrants:
+        #Top Left
+        for x in range(x_hard, (x_hard-31), -1):
+            for y in range(y_hard, (y_hard+31), 1):
+                #generate random 
+                is_hard = randint(0, 1)
+                if(is_hard == 0):
+                    grid[x][y]
+
+        #Top Right
+        for x in range(x_hard, (x_hard+31), 1):
+            for y in range(y_hard, (y_hard+31), 1):
+                #generate random 
+                is_hard = randint(0, 1)
+                if(is_hard == 0):
+                    grid[x][y]
+        #Bottom Left
+        for x in range(x_hard, (x_hard-31), -1):
+            for y in range(y_hard, (y_hard-31), -1):
+                #generate random 
+                is_hard = randint(0, 1)
+                if(is_hard == 0):
+                    grid[x][y]
+        #Bottom Right
+        for x in range(x_hard, (x_hard-31), -1):
+            for y in range(y_hard, (y_hard+31), 1):
+                #generate random 
+                is_hard = randint(0, 1)
+                if(is_hard == 0):
+                    grid[x][y]
+
+def check_path(direction, x, y):
+    x2, y2 = 0
+    if direction == 'l':
+        x2 = -1
+        y2 = 0
+    elif direction == 'r':
+        x2 = 1
+        y2 = 0
+    elif direction == 'u':
+        x2 = 0
+        y2 = 1
+    else:
+        x2 = 0
+        y2 = -1
+    for i in range(20):
+        x += x2
+        y += y2
+        if grid[x, y].terrain == 'a' or 'b':
+            return -1
+        if (x == 0 or 159) or (y == 0 or 119):
+            return i
+    
+def mark_path(direction, cell_count, x, y):        
+    x2, y2 = 0
+    if direction == 'l':
+        x2 = -1
+        y2 = 0
+    elif direction == 'r':
+        x2 = 1
+        y2 = 0
+    elif direction == 'u':
+        x2 = 0
+        y2 = 1
+    else:
+        x2 = 0
+        y2 = -1
+    for i in range(cell_count):
+        x += x2
+        y += y2
+        if grid[x, y].terrain == '0':
+            grid[x, y].terrain = 'a'
+        elif grid[x, y].terrain == '1':
+            grid[x, y].terrain = 'b'                    
+        
+        
+
+
+def make_highway():
+    cell_count = 0
+    river_count = 0
+    cell_count = 0
+    side = randint(1, 5)
+    side = 0 # 1: left, 2: right, 3: top, 4: bottom
+    x, y = 0
+    path1, path2, path3, path4 = []
+    
+    for i in range(10):
+        
+        direction = ''
+        avaliable_cell_count = 0
+        if side == 1:
+            x = 0
+            y = randint(0, 119)
+            direction = 'r'
+        elif side == 2:
+            x = 159
+            y = randint(0, 119)
+            direction = 'l'
+        elif side == 3:
+            x = randint(0, 159)
+            y = 0
+            direction = 'd'
+        else:
+            x = randint(0, 159)
+            y = 119
+            direction = 'u'
+            
+        
+        while cell_count < 100:
+            avaliable_cell_count = check_path(direction, x, y)
+
+
+    return True
+
+def make_blocked():
+    x_blocked, y_blocked, num_blocked = 0
+    while(num_blocked < TOTAL_BLOCKED):
+        x_blocked = randint(0, 160)
+        y_blocked = randint(0, 120)
+
+        if((grid[x_blocked][y_blocked].terrain != ('a' or 'b'))):
+            grid[x_blocked][y_blocked].terrain = '0'
+            ++num_blocked
+        
+
+
+def make_start():
+    is_top = randint(0,1)
+    is_left = randint(0,1)
+    start_x, start_y = 0
+
+def make_goal(start_x, start_y):
+    goal_x, goal_y = 0
+    is_top = randint(0,1)
+    is_left = randint(0,1)
+
+    if(is_top):
+        goal_y = randint(0, 20)
+    else:
+        goal_y = randint(100, 120)
+    if(is_left):
+        goal_x = randint(0, 20)
+    else:
+        goal_x = randint(100, 120)
+
+    #Set goal, if fail repeat
+    while True:
+        if(grid[goal_x][goal_y].terrain != '0'):
+            distance =  math.sqrt((goal_x - start_x)**2 + (goal_y - start_y)**2)
+            if(distance >= 100):
+                
+                #Set the goal at (goal_x, goal_y)
+                return
+
 def get_neighbors(Cell):
     x = Cell.x
     y = Cell.y
     neighbors = []
+    
+    #Diagonal Neighbors
+    if(x-1 > -1) and (y-1 > -1):
+        neighbors.append(grid[x-1][y-1])
+    if(x-1 > -1) and (y+1 < 120):
+        neighbors.append(grid[x-1][y+1])
+    if(x+1 < 160) and (y-1 > -1):
+        neighbors.append(grid[x+1][y-1])
+    if(x+1 < 160) and (y+1 < 120):
+        neighbors.append(grid[x+1][y+1])
+    
+    #Horizontal/Vertical Neighbors
     if(x-1 > -1):
-        if(y-1 > -1):
-            neighbors.append(grid[x-1][y-1])
-        elif(y+1 < 120):
-            neighbors.append(grid[x-1][y+1])
-    elif(x+1 < 160):
-        if(y-1 > -1):
-            neighbors.append(grid[x+1][y-1])
-        elif(y+1 < 120):
-            neighbors.append(grid[x+1][y+1])
+        neighbors.append(grid[x-1][y])
+    if(x+1 < 160):
+        neighbors.append(grid[x+1][y])
+    if(y-1 > -1):
+        neighbors.append(grid[x][y-1])
+    if(y+1 < 120):
+        neighbors.append(grid[x][y+1])
+    
+    return neighbors
+
+#print grid
+def print_grid():
+    for r in range (ROWS):
+        for c in range (COLS):
+            print (grid[r][c].terrain + " ")
+        print("/n")
+            
         
 
-def 
-#def get_coordinates(Cell):
-    
-    
