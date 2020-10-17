@@ -1,4 +1,4 @@
-from random import *
+from random import randint
 import math
 
 grid = []
@@ -21,8 +21,9 @@ class Cell:
         
 def make_grid(ROWS, COLS):
     for r in range (ROWS):
+        grid.append([])
         for c in range(COLS):
-            grid[r][c] = Cell(r, c, '0', -1, -1, -1)
+            grid[r].append(Cell(r, c, '0', -1, -1, -1))
 
 def make_hard():
     x_hard = 0
@@ -63,7 +64,10 @@ def make_hard():
                     grid[x][y]
 
 def check_path(direction, x, y):
-    x2, y2 = 0
+    x2 = 0 
+    y2 = 0
+    xi = x
+    yi = y
     if direction == 'l':
         x2 = -1
         y2 = 0
@@ -79,13 +83,17 @@ def check_path(direction, x, y):
     for i in range(20):
         x += x2
         y += y2
-        if grid[x, y].terrain == 'a' or 'b':
+        if grid[x][y].terrain == 'a' or 'b':
             return -1
         if (x == 0 or 159) or (y == 0 or 119):
-            return i
-    
+            return (xi, yi, x, y)
+    return (xi, yi, x, y)
+
 def mark_path(direction, cell_count, x, y):        
-    x2, y2 = 0
+    x2 = 0
+    y2 = 0
+    if check_path(direction, x, y) == -1:
+        return -1
     if direction == 'l':
         x2 = -1
         y2 = 0
@@ -101,10 +109,10 @@ def mark_path(direction, cell_count, x, y):
     for i in range(cell_count):
         x += x2
         y += y2
-        if grid[x, y].terrain == '0':
-            grid[x, y].terrain = 'a'
-        elif grid[x, y].terrain == '1':
-            grid[x, y].terrain = 'b'                    
+        if grid[x][y].terrain == '0':
+            grid[x][y].terrain = 'a'
+        elif grid[x][y].terrain == '1':
+            grid[x][y].terrain = 'b'                    
         
         
 
@@ -114,10 +122,11 @@ def make_highway():
     cell_count = 0
     highway_count = 0
     side = 0
-    x, y = 0
+    x = 0
+    y = 0
     paths = [[], [], [], []]
     
-    for i in range(10):
+    for i in range(4):
         if highway_count == 4:
             return True 
 
@@ -142,35 +151,40 @@ def make_highway():
             direction = 'u'
             
         j = 0
+        tup = 0
         while cell_count < 100:
-            avaliable_cell_count = check_path(direction, x, y)
+            tup = check_path(direction, x, y)
             paths[highway_count][j].append((x, y, )) 
 
     return False
 
 def make_blocked():
-    x_blocked, y_blocked, num_blocked = 0
+    x_blocked = 0
+    y_blocked = 0
+    num_blocked = 0
     while(num_blocked < TOTAL_BLOCKED):
         x_blocked = randint(0, 160)
         y_blocked = randint(0, 120)
 
         if((grid[x_blocked][y_blocked].terrain != ('a' or 'b'))):
             grid[x_blocked][y_blocked].terrain = '0'
-            ++num_blocked
+            num_blocked+=1
         
 
 
 def make_start():
     is_top = randint(0,1)
     is_left = randint(0,1)
-    start_x, start_y = 0
+    start_x = 0
+    start_y = 0
     while True:
         if(grid[start_x][start_y].terrain != '0'):
             #Set the start at (start_x, start_y)
             return
 
 def make_goal(start_x, start_y):
-    goal_x, goal_y = 0
+    goal_x = 0
+    goal_y = 0
     is_top = randint(0,1)
     is_left = randint(0,1)
 
