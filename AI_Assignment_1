@@ -163,8 +163,8 @@ def make_blocked():
     y_blocked = 0
     num_blocked = 0
     while(num_blocked < TOTAL_BLOCKED):
-        x_blocked = randint(0, 160)
-        y_blocked = randint(0, 120)
+        x_blocked = randint(0, COLS)
+        y_blocked = randint(0, ROWS)
 
         if((grid[x_blocked][y_blocked].terrain != ('a' or 'b'))):
             grid[x_blocked][y_blocked].terrain = '0'
@@ -241,4 +241,20 @@ def print_grid():
         print("/n")
             
         
+#Output File for Grid
+def write_grid_file():
+    pass
 
+#Read File for Grid
+def read_grid_file(file):
+    with open(file, 'r') as f:
+        sstart_coordinates = f.readline()
+        sgoal_coordinates = f.readline()
+        hard_traverse_coordinates = []
+        for i in range(8):
+            hard_traverse_coordinates.append(f.readline())
+        #make_grid(ROWS, COLS)
+        for rows in range(ROWS):
+            line = f.readline()
+            for cols in range(COLS):
+               grid[rows][cols].terrain = line[cols] 
