@@ -1,62 +1,374 @@
-import pygame
+from random import randint
 import math
 
-WIDTH = 700
-WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("A* Algorithm")
+grid = []
+start = []
+goal = []
 
-#Defined colors
-RED = (255, 0, 0)
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREY = (127, 127, 127)
+ROWS = 120
+COLS = 160
+TOTAL_BLOCKED = 3840
+
 
 class Cell:
-    def __init__(self, row, col, width, total_rows):
+    def __init__(self, row, col, terrain, g_cost, h_cost, f_cost):
         self.row = row
         self.col = col
-        self.x = row * width
-        self.y = col * width
-        self.color = WHITE
-        self.neighbors = []
-        self.width = width
-        self.total_rows = total_rows
-
-    def get_position(self):
-        return self.row, self.col
-
-    def draw(self, window):
-        pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.width))
+        self.terrain = terrain
+        self.g_cost = g_cost
+        self.h_cost = h_cost
+        self.f_cost = f_cost
         
-#BLOCKED_CELL = '0'
-#REGULAR_UNBLOCKED_CELL = '1'
-#HARD_TO_TRAVERSE_CELL = '2'
-#REGULAR_UNBLOCKED_CELL_HIGHWAY = 'a'
-#HARD_TO_TRAVERSE_CELL_HIGHWAY = 'b'
-
-def generate_grid(rows, cols, width):
-    #(120, 160)
-    #arr = [[0 for i in range(cols)] for j in range(rows)]
-    grid - []
-    gap = width // rows
-    for i in range(rows):
+def make_grid(COLS, ROWS):
+    for r in range (ROWS):
         grid.append([])
-        for j in range(cols):
-            cell = Cell(i, j, gap, rows)
-            grid[i].append(cell)
-def draw_grid(window, rows, cols, width):
-    gap = width //rows
-    for i in range (rows):
-        pygame.draw.line(window, GREY, (0, i * gap), (width, i * gap))
-        for j in range (cols):
-            pygame.draw.line(window, GREY, (j * gap, 0), (j * gap, width))
-def draw(window, grid, rows, width):
-    window.fill(WHITE)
+        for c in range(COLS):
+            grid[r].append(Cell(r, c, '0', -1, -1, -1))
 
-    for row
-#def generate_start():
+def make_hard():
+    x_hard = 0
+    y_hard = 0
+    for i in range(8):
+        x_hard = randint(0, (COLS-1))
+        y_hard = randint(0, (ROWS-1))
+        hard_randomize(x_hard, y_hard)
 
-#def generate_goal(): 
+def hard_randomize(x_hard, y_hard):
+    #TODO: make sure you cover directly horizontal/vertical
+    #Four Quadrants:
+    #Top Left
+    for x in range(x_hard, (x_hard-15), -1):
+        if(x > -1):
+            for y in range(y_hard, (y_hard+15), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
 
-def generate_map():
-    generate_grid()
+    #Top Right
+    for x in range(x_hard, (x_hard+15), 1):
+        if (x < COLS):
+            for y in range(y_hard, (y_hard+15), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
+    #Bottom Left
+    for x in range(x_hard, (x_hard-31), -1):
+        if(x > -1):
+            for y in range(y_hard, (y_hard-31), -1):
+                #generate random 
+                if(y > -1):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
+    
+    #Bottom Right
+    for x in range(x_hard, (x_hard-31), -1):
+        if(x > -1):
+            for y in range(y_hard, (y_hard+31), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
+
+        
+def init_path():
+    x = 0
+    y = 0
+    direction = ''
+    side = randint(1, 5)
+    
+    if side == 1:
+        x = 0
+        y = randint(0, 119)
+        direction = 'r'
+    elif side == 2:
+        x = 159
+        y = randint(0, 119)
+        direction = 'l'
+    elif side == 3:
+        x = randint(0, 159)
+        y = 0
+        direction = 'd'
+    else:
+        x = randint(0, 159)
+        y = 119
+        direction = 'u'
+    if grid[x][y].terrain == 'a' or 'b':
+        return init_path()
+    return (x, y, direction)
+
+def direct(current_direction):
+
+    vector = ''
+    prob = randint(0, 100)
+    new_direction = ''
+
+    if(prob >= 0 and prob < 60):
+        vector = 's'
+    elif(prob >= 60 and prob < 80):
+        vector = 'l'
+    else:
+        vector = 'r'
+
+    if current_direction == 'l':
+        if vector == 's':
+            new_direction = 'l'
+        elif vector == 'l':
+            new_direction = 'd'
+        else:
+            new_direction = 'u'
+
+    elif current_direction == 'r':
+        if vector == 's':
+            new_direction = 'r'
+        elif vector == 'l':
+            new_direction = 'u'
+        else:
+            new_direction = 'd'
+
+    elif current_direction == 'u':
+        if vector == 's':
+            new_direction = 'u'
+        elif vector == 'l':
+            new_direction = 'l'
+        else:
+            new_direction = 'r'
+
+    else:
+        if vector == 's':
+            new_direction = 'd'
+        elif vector == 'l':
+            new_direction = 'r'
+        else:
+            new_direction = 'l'
+
+    return new_direction
+
+def position(x, y, direction, inc):
+
+    if direction == 'd':
+        y += inc
+    elif direction == 'u':
+        y -= inc
+    elif direction == 'l':
+        x -= inc
+    else:
+        x += inc
+
+    return (x, y)
+
+def moving(direction):
+    if direction == 'l':
+        x = -1
+        y = 0
+    elif direction == 'r':
+        x = 1
+        y = 0
+    elif direction == 'u':
+        x = 0
+        y = 1
+    else:
+        x = 0
+        y = -1
+    return (x, y)
+
+def mark_seg(x, y, direction, temp_grid2):
+    inc = moving(direction)
+    x_inc = inc[0]
+    y_inc = inc[1]
+
+    for i in range(20):
+        if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
+            return -1
+        
+        elif temp_grid2[x][y].terrain == '0':
+            temp_grid2[x][y].terrain = 'a'
+        elif temp_grid2[x][y].terrain == '1':
+            temp_grid2[x][y].terrain = 'b'
+
+        x += x_inc
+        y += y_inc
+
+        if x == 0 or x == 159 or y == 0 or y == 119:
+            return i
+
+    return 20
+
+
+
+def make_path(temp_grid, start_point):
+    temp_grid2 = temp_grid[:]
+    cell_count = 0
+
+    x = start_point[0]
+    y = start_point[1]
+    direction = start_point[2]
+
+    check = mark_seg(x, y, direction, temp_grid2)
+
+    
+    if check == -1:
+        return -1
+    cell_count += check    
+
+    x = position(x, y, direction, check)[0]
+    y = position(x, y, direction, check)[1]
+    
+    while cell_count < 100:
+        direction = direct(direction)
+        check = mark_seg(x, y, direction, temp_grid2)
+        if check == -1:
+            return -1
+
+        cell_count += check    
+
+        x = position(x, y, direction, check)[0]
+        y = position(x, y, direction, check)[1]
+
+    return temp_grid2
+
+
+def make_highway():
+    temp_grid = grid[:]
+    
+
+    for i in range(4):
+        path_tries = 0
+        check = -1
+        
+        while check == -1:
+            start_point = init_path()
+            if path_tries == 9:
+                return -1
+            check = make_path(temp_grid, start_point)
+            path_tries += 1
+        temp_grid = check
+
+    return temp_grid
+
+def make_blocked():
+    x_blocked = 0
+    y_blocked = 0
+    num_blocked = 0
+    while(num_blocked < TOTAL_BLOCKED):
+        x_blocked = randint(0, COLS)
+        y_blocked = randint(0, ROWS)
+
+        if((grid[x_blocked][y_blocked].terrain != ('a' or 'b'))):
+            grid[x_blocked][y_blocked].terrain = '0'
+            num_blocked+=1
+        
+
+def make_start():
+    is_top = randint(0,1)
+    is_left = randint(0,1)
+    start_x = 0
+    start_y = 0
+    if(is_top):
+        start_y = randint(0, 20)
+    else:
+        start_y = randint(100, 120)
+    if(is_left):
+        start_x = randint(0, 20)
+    else:
+        start_x = randint(140, 160)
+    while True:
+        if(grid[start_x][start_y].terrain != '0'):
+            start[0] = start_x
+            start[1] = start_y
+            return
+
+def make_goal(start_x, start_y):
+    goal_x = 0
+    goal_y = 0
+    is_top = randint(0,1)
+    is_left = randint(0,1)
+
+    if(is_top):
+        goal_y = randint(0, 20)
+    else:
+        goal_y = randint(100, 120)
+    if(is_left):
+        goal_x = randint(0, 20)
+    else:
+        goal_x = randint(140, 160)
+
+    #Set goal, if fail repeat
+    while True:
+        if(grid[goal_x][goal_y].terrain != '0'):
+            distance =  math.sqrt((goal_x - start_x)**2 + (goal_y - start_y)**2)
+            if(distance >= 100):
+                
+                #Set the goal at (goal_x, goal_y)
+                return
+
+def get_neighbors(Cell):
+    x = Cell.x
+    y = Cell.y
+    neighbors = []
+    
+    #Diagonal Neighbors
+    if(x-1 > -1) and (y-1 > -1):
+        neighbors.append(grid[x-1][y-1])
+    if(x-1 > -1) and (y+1 < 120):
+        neighbors.append(grid[x-1][y+1])
+    if(x+1 < 160) and (y-1 > -1):
+        neighbors.append(grid[x+1][y-1])
+    if(x+1 < 160) and (y+1 < 120):
+        neighbors.append(grid[x+1][y+1])
+    
+    #Horizontal/Vertical Neighbors
+    if(x-1 > -1):
+        neighbors.append(grid[x-1][y])
+    if(x+1 < 160):
+        neighbors.append(grid[x+1][y])
+    if(y-1 > -1):
+        neighbors.append(grid[x][y-1])
+    if(y+1 < 120):
+        neighbors.append(grid[x][y+1])
+    
+    return neighbors
+
+#print grid
+def print_grid():
+    for r in range (ROWS):
+        for c in range (COLS):
+            print (grid[r][c].terrain + " ")
+        print("/n")
+            
+        
+#Output File for Grid
+def write_grid_file():
+    my_file = open("grid_file.txt", "w")
+    my_file.write(start)
+    my_file.write(goal)
+    #for i in range(8):
+
+    my_file.close()
+    pass
+
+#Read File for Grid
+def read_grid_file(file):
+    with open(file, 'r') as f:
+        start_coordinates = f.readline()
+
+        goal_coordinates = f.readline()
+        
+        #hard_traverse_coordinates = []
+        for i in range(8):
+            #Take coordinates and randomize in 31x31
+            hard_randomize(f.readline())
+            #hard_traverse_coordinates.append(f.readline())
+        #make_grid(ROWS, COLS)
+        for rows in range(ROWS):
+            line = f.readline()
+            for cols in range(COLS):
+               grid[rows][cols].terrain = line[cols] 
