@@ -16,10 +16,7 @@ class Cell:
         self.h_cost = h_cost
         self.f_cost = f_cost
 
-#TODO: Needed to implement make__
-def distance(x_1, y_1, x_2, y_2):
-    #Method to find the distance from one cell to another cell
-    print() 
+
   
         
 def make_grid(ROWS, COLS):
@@ -114,17 +111,19 @@ def mark_path(direction, cell_count, x, y):
 
 def make_highway():
     cell_count = 0
-    river_count = 0
     cell_count = 0
-    side = randint(1, 5)
-    side = 0 # 1: left, 2: right, 3: top, 4: bottom
+    highway_count = 0
+    side = 0
     x, y = 0
-    path1, path2, path3, path4 = []
+    paths = [[], [], [], []]
     
     for i in range(10):
-        
+        if highway_count == 4:
+            return True 
+
         direction = ''
         avaliable_cell_count = 0
+        side = randint(1, 5)
         if side == 1:
             x = 0
             y = randint(0, 119)
@@ -142,12 +141,12 @@ def make_highway():
             y = 119
             direction = 'u'
             
-        
+        j = 0
         while cell_count < 100:
             avaliable_cell_count = check_path(direction, x, y)
+            paths[highway_count][j].append((x, y, )) 
 
-
-    return True
+    return False
 
 def make_blocked():
     x_blocked, y_blocked, num_blocked = 0
@@ -165,6 +164,10 @@ def make_start():
     is_top = randint(0,1)
     is_left = randint(0,1)
     start_x, start_y = 0
+    while True:
+        if(grid[start_x][start_y].terrain != '0'):
+            #Set the start at (start_x, start_y)
+            return
 
 def make_goal(start_x, start_y):
     goal_x, goal_y = 0
