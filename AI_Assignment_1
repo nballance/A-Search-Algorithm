@@ -18,11 +18,8 @@ class Cell:
         self.g_cost = g_cost
         self.h_cost = h_cost
         self.f_cost = f_cost
-
-
-  
         
-def make_grid(ROWS, COLS):
+def make_grid(COLS, ROWS):
     for r in range (ROWS):
         grid.append([])
         for c in range(COLS):
@@ -32,41 +29,54 @@ def make_hard():
     x_hard = 0
     y_hard = 0
     for i in range(8):
-        x_hard = randint(0, 159)
-        y_hard = randint(0, 119)
+        x_hard = randint(0, (COLS-1))
+        y_hard = randint(0, (ROWS-1))
         hard_randomize(x_hard, y_hard)
 
 def hard_randomize(x_hard, y_hard):
+    #TODO: make sure you cover directly horizontal/vertical
     #Four Quadrants:
     #Top Left
-    for x in range(x_hard, (x_hard-31), -1):
-        for y in range(y_hard, (y_hard+31), 1):
-            #generate random 
-            is_hard = randint(0, 1)
-            if(is_hard == 0):
-                grid[x][y]
+    for x in range(x_hard, (x_hard-15), -1):
+        if(x > -1):
+            for y in range(y_hard, (y_hard+15), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
 
     #Top Right
-    for x in range(x_hard, (x_hard+31), 1):
-        for y in range(y_hard, (y_hard+31), 1):
-            #generate random 
-            is_hard = randint(0, 1)
-            if(is_hard == 0):
-                grid[x][y]
+    for x in range(x_hard, (x_hard+15), 1):
+        if (x < COLS):
+            for y in range(y_hard, (y_hard+15), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
     #Bottom Left
     for x in range(x_hard, (x_hard-31), -1):
-        for y in range(y_hard, (y_hard-31), -1):
-            #generate random 
-            is_hard = randint(0, 1)
-            if(is_hard == 0):
-                grid[x][y]
+        if(x > -1):
+            for y in range(y_hard, (y_hard-31), -1):
+                #generate random 
+                if(y > -1):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
+    
     #Bottom Right
     for x in range(x_hard, (x_hard-31), -1):
-        for y in range(y_hard, (y_hard+31), 1):
-            #generate random 
-            is_hard = randint(0, 1)
-            if(is_hard == 0):
-                grid[x][y]
+        if(x > -1):
+            for y in range(y_hard, (y_hard+31), 1):
+                #generate random 
+                if(y < ROWS):
+                    is_hard = randint(0, 1)
+                    if(is_hard == 0):
+                        grid[x][y].terrain = '2'
+
 
         
 def init_path():
@@ -91,7 +101,7 @@ def init_path():
         x = randint(0, 159)
         y = 119
         direction = 'u'
-    if grid[x][y].terrian == 'a' or 'b':
+    if grid[x][y].terrain == 'a' or 'b':
         return init_path()
     return (x, y, direction)
 
