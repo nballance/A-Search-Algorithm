@@ -1,5 +1,6 @@
 from random import randint
 import math
+from array import *
 
 grid = []
 start = []
@@ -7,6 +8,11 @@ goal = []
 
 ROWS = 120
 COLS = 160
+# ROWS = 2
+# COLS = 3
+
+
+
 TOTAL_BLOCKED = 3840
 
 
@@ -19,19 +25,28 @@ class Cell:
         self.h_cost = h_cost
         self.f_cost = f_cost
         
-def make_grid(COLS, ROWS):
-    for r in range (ROWS):
+def make_grid():
+    for column in range (COLS):
         grid.append([])
-        for c in range(COLS):
-            grid[r].append(Cell(r, c, '0', -1, -1, -1))
+        for row in range(ROWS):
+            grid[column].append(Cell(column, row, '0', -1, -1, -1))
+
+    # for row in range (ROWS):
+    #     grid.append([])
+    #     for column in range(COLS):
+    #         grid[row].append(Cell(row, column, '0', -1, -1, -1))
 
 def make_hard():
     x_hard = 0
     y_hard = 0
     for i in range(8):
         x_hard = randint(0, (COLS-1))
+        print(x_hard)
         y_hard = randint(0, (ROWS-1))
+        print(y_hard)
+        
         hard_randomize(x_hard, y_hard)
+
 
 def hard_randomize(x_hard, y_hard):
     #TODO: make sure you cover directly horizontal/vertical
@@ -44,6 +59,7 @@ def hard_randomize(x_hard, y_hard):
                 if(y < ROWS):
                     is_hard = randint(0, 1)
                     if(is_hard == 0):
+                        print("Coordinate: ", x, " ", y)
                         grid[x][y].terrain = '2'
 
     #Top Right
@@ -57,9 +73,9 @@ def hard_randomize(x_hard, y_hard):
                         grid[x][y].terrain = '2'
 
     #Bottom Left
-    for x in range(x_hard, (x_hard-31), -1):
+    for x in range(x_hard, (x_hard-15), -1):
         if(x > -1):
-            for y in range(y_hard, (y_hard-31), -1):
+            for y in range(y_hard, (y_hard-15), -1):
                 #generate random 
                 if(y > -1):
                     is_hard = randint(0, 1)
@@ -68,9 +84,9 @@ def hard_randomize(x_hard, y_hard):
 
     
     #Bottom Right
-    for x in range(x_hard, (x_hard-31), -1):
+    for x in range(x_hard, (x_hard-15), -1):
         if(x > -1):
-            for y in range(y_hard, (y_hard+31), 1):
+            for y in range(y_hard, (y_hard+15), 1):
                 #generate random 
                 if(y < ROWS):
                     is_hard = randint(0, 1)
@@ -79,30 +95,30 @@ def hard_randomize(x_hard, y_hard):
 
 
         
-def init_path():
+def init_path(temp_grid):
     x = 0
     y = 0
     direction = ''
-    side = randint(1, 5)
+    side = randint(1, 4)
     
     if side == 1:
         x = 0
-        y = randint(0, 119)
+        y = randint(0, ROWS-1)
         direction = 'r'
     elif side == 2:
-        x = 159
-        y = randint(0, 119)
+        x = COLS-1
+        y = randint(0, ROWS-1)
         direction = 'l'
     elif side == 3:
-        x = randint(0, 159)
+        x = randint(0, COLS-1)
         y = 0
         direction = 'd'
     else:
-        x = randint(0, 159)
-        y = 119
+        x = randint(0, COLS-1)
+        y = ROWS-1
         direction = 'u'
-    if grid[x][y].terrain == 'a' or 'b':
-        return init_path()
+    if temp_grid[x][y].terrain == 'a' or temp_grid[x][y].terrain == 'b':
+        return init_path(temp_grid)
     return (x, y, direction)
 
 def direct(current_direction):
@@ -185,11 +201,17 @@ def mark_seg(x, y, direction, temp_grid2):
     x_inc = inc[0]
     y_inc = inc[1]
 
+
     for i in range(20):
+        print("coordinates: ", x, y)
+
+        if (x < 0 or x > COLS-1 or y < 0 or y > ROWS-1):
+            return i
+
         if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
             return -1
-        
-        elif temp_grid2[x][y].terrain == '0':
+
+        if temp_grid2[x][y].terrain == '0':
             temp_grid2[x][y].terrain = 'a'
         elif temp_grid2[x][y].terrain == '1':
             temp_grid2[x][y].terrain = 'b'
@@ -197,8 +219,7 @@ def mark_seg(x, y, direction, temp_grid2):
         x += x_inc
         y += y_inc
 
-        if x == 0 or x == 159 or y == 0 or y == 119:
-            return i
+        
 
     return 20
 
@@ -239,17 +260,18 @@ def make_path(temp_grid, start_point):
 def make_highway():
     temp_grid = grid[:]
     
-
     for i in range(4):
         path_tries = 0
         check = -1
         
         while check == -1:
-            start_point = init_path()
             if path_tries == 9:
                 return -1
+
+            start_point = init_path(temp_grid)
             check = make_path(temp_grid, start_point)
             path_tries += 1
+
         temp_grid = check
 
     return temp_grid
@@ -339,11 +361,10 @@ def get_neighbors(Cell):
 
 #print grid
 def print_grid():
-    for r in range (ROWS):
-        for c in range (COLS):
-            print (grid[r][c].terrain + " ")
-        print("/n")
-            
+    for row in range (ROWS):
+        for column in range (COLS):
+            print (grid[column][row].terrain, end = '\t')
+        print("\n")
         
 #Output File for Grid
 def write_grid_file():
