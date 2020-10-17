@@ -37,9 +37,6 @@ heapify(open_list)
 
 
 
-
-
-
 def distance():
     pass
 
