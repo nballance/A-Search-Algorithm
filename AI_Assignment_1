@@ -2,6 +2,9 @@ from random import randint
 import math
 
 grid = []
+start = []
+goal = []
+
 ROWS = 120
 COLS = 160
 TOTAL_BLOCKED = 3840
@@ -31,132 +34,215 @@ def make_hard():
     for i in range(8):
         x_hard = randint(0, 159)
         y_hard = randint(0, 119)
+        hard_randomize(x_hard, y_hard)
 
-        #Four Quadrants:
-        #Top Left
-        for x in range(x_hard, (x_hard-31), -1):
-            for y in range(y_hard, (y_hard+31), 1):
-                #generate random 
-                is_hard = randint(0, 1)
-                if(is_hard == 0):
-                    grid[x][y]
+def hard_randomize(x_hard, y_hard):
+    #Four Quadrants:
+    #Top Left
+    for x in range(x_hard, (x_hard-31), -1):
+        for y in range(y_hard, (y_hard+31), 1):
+            #generate random 
+            is_hard = randint(0, 1)
+            if(is_hard == 0):
+                grid[x][y]
 
-        #Top Right
-        for x in range(x_hard, (x_hard+31), 1):
-            for y in range(y_hard, (y_hard+31), 1):
-                #generate random 
-                is_hard = randint(0, 1)
-                if(is_hard == 0):
-                    grid[x][y]
-        #Bottom Left
-        for x in range(x_hard, (x_hard-31), -1):
-            for y in range(y_hard, (y_hard-31), -1):
-                #generate random 
-                is_hard = randint(0, 1)
-                if(is_hard == 0):
-                    grid[x][y]
-        #Bottom Right
-        for x in range(x_hard, (x_hard-31), -1):
-            for y in range(y_hard, (y_hard+31), 1):
-                #generate random 
-                is_hard = randint(0, 1)
-                if(is_hard == 0):
-                    grid[x][y]
+    #Top Right
+    for x in range(x_hard, (x_hard+31), 1):
+        for y in range(y_hard, (y_hard+31), 1):
+            #generate random 
+            is_hard = randint(0, 1)
+            if(is_hard == 0):
+                grid[x][y]
+    #Bottom Left
+    for x in range(x_hard, (x_hard-31), -1):
+        for y in range(y_hard, (y_hard-31), -1):
+            #generate random 
+            is_hard = randint(0, 1)
+            if(is_hard == 0):
+                grid[x][y]
+    #Bottom Right
+    for x in range(x_hard, (x_hard-31), -1):
+        for y in range(y_hard, (y_hard+31), 1):
+            #generate random 
+            is_hard = randint(0, 1)
+            if(is_hard == 0):
+                grid[x][y]
 
-def check_path(direction, x, y):
-    x2 = 0 
-    y2 = 0
-    xi = x
-    yi = y
-    if direction == 'l':
-        x2 = -1
-        y2 = 0
-    elif direction == 'r':
-        x2 = 1
-        y2 = 0
-    elif direction == 'u':
-        x2 = 0
-        y2 = 1
+        
+def init_path():
+    x = 0
+    y = 0
+    direction = ''
+    side = randint(1, 5)
+    
+    if side == 1:
+        x = 0
+        y = randint(0, 119)
+        direction = 'r'
+    elif side == 2:
+        x = 159
+        y = randint(0, 119)
+        direction = 'l'
+    elif side == 3:
+        x = randint(0, 159)
+        y = 0
+        direction = 'd'
     else:
-        x2 = 0
-        y2 = -1
+        x = randint(0, 159)
+        y = 119
+        direction = 'u'
+    if grid[x][y].terrian == 'a' or 'b':
+        return init_path()
+    return (x, y, direction)
+
+def direct(current_direction):
+
+    vector = ''
+    prob = randint(0, 100)
+    new_direction = ''
+
+    if(prob >= 0 and prob < 60):
+        vector = 's'
+    elif(prob >= 60 and prob < 80):
+        vector = 'l'
+    else:
+        vector = 'r'
+
+    if current_direction == 'l':
+        if vector == 's':
+            new_direction = 'l'
+        elif vector == 'l':
+            new_direction = 'd'
+        else:
+            new_direction = 'u'
+
+    elif current_direction == 'r':
+        if vector == 's':
+            new_direction = 'r'
+        elif vector == 'l':
+            new_direction = 'u'
+        else:
+            new_direction = 'd'
+
+    elif current_direction == 'u':
+        if vector == 's':
+            new_direction = 'u'
+        elif vector == 'l':
+            new_direction = 'l'
+        else:
+            new_direction = 'r'
+
+    else:
+        if vector == 's':
+            new_direction = 'd'
+        elif vector == 'l':
+            new_direction = 'r'
+        else:
+            new_direction = 'l'
+
+    return new_direction
+
+def position(x, y, direction, inc):
+
+    if direction == 'd':
+        y += inc
+    elif direction == 'u':
+        y -= inc
+    elif direction == 'l':
+        x -= inc
+    else:
+        x += inc
+
+    return (x, y)
+
+def moving(direction):
+    if direction == 'l':
+        x = -1
+        y = 0
+    elif direction == 'r':
+        x = 1
+        y = 0
+    elif direction == 'u':
+        x = 0
+        y = 1
+    else:
+        x = 0
+        y = -1
+    return (x, y)
+
+def mark_seg(x, y, direction, temp_grid2):
+    inc = moving(direction)
+    x_inc = inc[0]
+    y_inc = inc[1]
+
     for i in range(20):
-        x += x2
-        y += y2
-        if grid[x][y].terrain == 'a' or 'b':
+        if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
             return -1
-        if (x == 0 or 159) or (y == 0 or 119):
-            return (xi, yi, x, y)
-    return (xi, yi, x, y)
+        
+        elif temp_grid2[x][y].terrain == '0':
+            temp_grid2[x][y].terrain = 'a'
+        elif temp_grid2[x][y].terrain == '1':
+            temp_grid2[x][y].terrain = 'b'
 
-def mark_path(direction, cell_count, x, y):        
-    x2 = 0
-    y2 = 0
-    if check_path(direction, x, y) == -1:
+        x += x_inc
+        y += y_inc
+
+        if x == 0 or x == 159 or y == 0 or y == 119:
+            return i
+
+    return 20
+
+
+
+def make_path(temp_grid, start_point):
+    temp_grid2 = temp_grid[:]
+    cell_count = 0
+
+    x = start_point[0]
+    y = start_point[1]
+    direction = start_point[2]
+
+    check = mark_seg(x, y, direction, temp_grid2)
+
+    
+    if check == -1:
         return -1
-    if direction == 'l':
-        x2 = -1
-        y2 = 0
-    elif direction == 'r':
-        x2 = 1
-        y2 = 0
-    elif direction == 'u':
-        x2 = 0
-        y2 = 1
-    else:
-        x2 = 0
-        y2 = -1
-    for i in range(cell_count):
-        x += x2
-        y += y2
-        if grid[x][y].terrain == '0':
-            grid[x][y].terrain = 'a'
-        elif grid[x][y].terrain == '1':
-            grid[x][y].terrain = 'b'                    
-        
-        
+    cell_count += check    
+
+    x = position(x, y, direction, check)[0]
+    y = position(x, y, direction, check)[1]
+    
+    while cell_count < 100:
+        direction = direct(direction)
+        check = mark_seg(x, y, direction, temp_grid2)
+        if check == -1:
+            return -1
+
+        cell_count += check    
+
+        x = position(x, y, direction, check)[0]
+        y = position(x, y, direction, check)[1]
+
+    return temp_grid2
 
 
 def make_highway():
-    cell_count = 0
-    cell_count = 0
-    highway_count = 0
-    side = 0
-    x = 0
-    y = 0
-    paths = [[], [], [], []]
+    temp_grid = grid[:]
     
+
     for i in range(4):
-        if highway_count == 4:
-            return True 
+        path_tries = 0
+        check = -1
+        
+        while check == -1:
+            start_point = init_path()
+            if path_tries == 9:
+                return -1
+            check = make_path(temp_grid, start_point)
+            path_tries += 1
+        temp_grid = check
 
-        direction = ''
-        avaliable_cell_count = 0
-        side = randint(1, 5)
-        if side == 1:
-            x = 0
-            y = randint(0, 119)
-            direction = 'r'
-        elif side == 2:
-            x = 159
-            y = randint(0, 119)
-            direction = 'l'
-        elif side == 3:
-            x = randint(0, 159)
-            y = 0
-            direction = 'd'
-        else:
-            x = randint(0, 159)
-            y = 119
-            direction = 'u'
-            
-        j = 0
-        tup = 0
-        while cell_count < 100:
-            tup = check_path(direction, x, y)
-            paths[highway_count][j].append((x, y, )) 
-
-    return False
+    return temp_grid
 
 def make_blocked():
     x_blocked = 0
@@ -171,15 +257,23 @@ def make_blocked():
             num_blocked+=1
         
 
-
 def make_start():
     is_top = randint(0,1)
     is_left = randint(0,1)
     start_x = 0
     start_y = 0
+    if(is_top):
+        start_y = randint(0, 20)
+    else:
+        start_y = randint(100, 120)
+    if(is_left):
+        start_x = randint(0, 20)
+    else:
+        start_x = randint(140, 160)
     while True:
         if(grid[start_x][start_y].terrain != '0'):
-            #Set the start at (start_x, start_y)
+            start[0] = start_x
+            start[1] = start_y
             return
 
 def make_goal(start_x, start_y):
@@ -195,7 +289,7 @@ def make_goal(start_x, start_y):
     if(is_left):
         goal_x = randint(0, 20)
     else:
-        goal_x = randint(100, 120)
+        goal_x = randint(140, 160)
 
     #Set goal, if fail repeat
     while True:
@@ -243,16 +337,26 @@ def print_grid():
         
 #Output File for Grid
 def write_grid_file():
+    my_file = open("grid_file.txt", "w")
+    my_file.write(start)
+    my_file.write(goal)
+    #for i in range(8):
+
+    my_file.close()
     pass
 
 #Read File for Grid
 def read_grid_file(file):
     with open(file, 'r') as f:
-        sstart_coordinates = f.readline()
-        sgoal_coordinates = f.readline()
-        hard_traverse_coordinates = []
+        start_coordinates = f.readline()
+
+        goal_coordinates = f.readline()
+        
+        #hard_traverse_coordinates = []
         for i in range(8):
-            hard_traverse_coordinates.append(f.readline())
+            #Take coordinates and randomize in 31x31
+            hard_randomize(f.readline())
+            #hard_traverse_coordinates.append(f.readline())
         #make_grid(ROWS, COLS)
         for rows in range(ROWS):
             line = f.readline()
