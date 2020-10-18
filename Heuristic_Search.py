@@ -1,26 +1,28 @@
 from heapq import heapify, heappush, heappop
 from Map import *
 import math
-
 WEIGHT = 1
 #Initialize open and closed lists
 #Make the start Vertex current
 
-current = grid[start[0], start[1]]
-open_list = []
-closed_list = []
 
-heapify(open_list)
+def a_search():
+    current = grid[start[0], start[1]]
+    open_list = []
+    closed_list = []
 
-while (current != goal): 
-    neighbors = get_neighbors(current)
-    length = len(neighbors)
-    for i in range(length):
-        cur_neighbor = neighbors[i]
-        if (neighbors[i] not in open_list) and (neighbors[i]not in closed_list):
+    heapify(open_list)
 
-            heappush(open_list, (neighbors[i].f_cost, neighbors[i])
-            grid[cur_neighbor.row][cur_neighbor.col] = calculate_g_val(cur_neighbor)
+    while (current != goal): 
+        neighbors = get_neighbors(current)
+        length = len(neighbors)
+        for i in range(length):
+            cur_neighbor = neighbors[i]
+            if ((neighbors[i] not in open_list) and (neighbors[i] not in closed_list)):
+                heappush(open_list, (neighbors[i].f_cost, neighbors[i]))
+
+                
+#c              
 
 #Calculate heuristic distance of start vertex to destination (h)
 #Calculate f value for start vertex (f = g + h, where g = 0)
@@ -40,8 +42,6 @@ while (current != goal):
 # |  Remove vertex to closed list
 # |  Remove vertex with lowest f value from open list and make it current
 # |End WHILE   
-#
-
 
 #Cost from starting node
 def calculate_g_val(cell):
@@ -61,20 +61,20 @@ def calculate_g_val(cell):
     #Regular to Regular
     if((terrain1 == '1' or terrain1 =='a') and (terrain2 == '1' or terrain2 =='a') ):
         if(diagonal):
-            cost = Math.sqrt(2)
+            cost = math.sqrt(2)
         else:
             cost = 1 
 
     #Regular to Hard/Hard to Regular
     if(((terrain1 == '1' or terrain1 =='a') and (terrain2 == '2' or terrain2 =='b')) or ((terrain1 == '2' or terrain1 =='b') and (terrain2 == '1' or terrain2 =='a'))):
         if(diagonal):
-            cost = (Math.sqrt(2) + Math.sqrt(8)) /2
+            cost = (math.sqrt(2) + math.sqrt(8)) /2
         else:
             cost = 1.5 
     #Hard to Hard
     if((terrain1 == '2' or terrain1 =='b') and (terrain2 == '2' or terrain2 =='b') ):
         if(diagonal):
-            cost = Math.sqrt(8)
+            cost = math.sqrt(8)
         else:
             cost = 2
     if(highway):
@@ -82,20 +82,18 @@ def calculate_g_val(cell):
 
     grid[cell.row][cell.col].g_cost = cell.parent.g_cost + cost 
     
-    pass
-    
 
 #Cost to ending node
 def calculate_h_val(cell):
     distance_to_goal = distance(cell)
     cell.h_cost = (distance_to_goal[0] * math.sqrt(2) + distance_to_goal[1]) 
-    grid[cell[row], cell[col]].h_cost = cell.h_cost
+    grid[cell[cell.row], cell[cell.col]].h_cost = cell.h_cost
 
 #G Cost + H Cost
 #Check parent
 def calculate_f_val(cell):
     cell.f_cost = cell.g_cost + cell.h_cost
-    grid[cell[row], cell[col]].f_cost = cell.f_cost
+    grid[cell[cell.row], cell[cell.col]].f_cost = cell.f_cost
 
 #Number of diagonals and number of straight path
 def distance(cell):
