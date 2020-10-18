@@ -16,10 +16,11 @@ while (current != goal):
     neighbors = get_neighbors(current)
     length = len(neighbors)
     for i in range(length):
+        cur_neighbor = neighbors[i]
         if (neighbors[i] not in open_list) and (neighbors[i]not in closed_list):
-            heappush(open_list, neighbors[i])
-            
- 
+
+            heappush(open_list, (neighbors[i].f_cost, neighbors[i])
+            grid[cur_neighbor.row][cur_neighbor.col] = calculate_g_val(cur_neighbor)
 
 #Calculate heuristic distance of start vertex to destination (h)
 #Calculate f value for start vertex (f = g + h, where g = 0)
@@ -44,18 +45,57 @@ while (current != goal):
 
 #Cost from starting node
 def calculate_g_val(cell):
+    terrain1 = cell.terrain
+    terrain2 = cell.parent.terrain
+    highway = False
+    diagonal = False
+    cost = 0
+
+    #Diagonal or not
+    if((cell.row != cell.parent.row) and (cell.col != cell.parent.col)):
+        diagonal = True
+
+    if((terrain1 == 'a' or terrain1 =='b') and (terrain2 == 'a' or terrain2 =='b')):
+        highway = True
+    
+    #Regular to Regular
+    if((terrain1 == '1' or terrain1 =='a') and (terrain2 == '1' or terrain2 =='a') ):
+        if(diagonal):
+            cost = Math.sqrt(2)
+        else:
+            cost = 1 
+
+    #Regular to Hard/Hard to Regular
+    if(((terrain1 == '1' or terrain1 =='a') and (terrain2 == '2' or terrain2 =='b')) or ((terrain1 == '2' or terrain1 =='b') and (terrain2 == '1' or terrain2 =='a'))):
+        if(diagonal):
+            cost = (Math.sqrt(2) + Math.sqrt(8)) /2
+        else:
+            cost = 1.5 
+    #Hard to Hard
+    if((terrain1 == '2' or terrain1 =='b') and (terrain2 == '2' or terrain2 =='b') ):
+        if(diagonal):
+            cost = Math.sqrt(8)
+        else:
+            cost = 2
+    if(highway):
+        cost = cost/4
+
+    grid[cell.row][cell.col].g_cost = cell.parent.g_cost + cost 
+    
     pass
-    #Take previous node(s) distance and add distance from last node to current
     
 
 #Cost to ending node
 def calculate_h_val(cell):
     distance_to_goal = distance(cell)
     cell.h_cost = (distance_to_goal[0] * math.sqrt(2) + distance_to_goal[1]) 
+    grid[cell[row], cell[col]].h_cost = cell.h_cost
 
 #G Cost + H Cost
+#Check parent
 def calculate_f_val(cell):
     cell.f_cost = cell.g_cost + cell.h_cost
+    grid[cell[row], cell[col]].f_cost = cell.f_cost
 
 #Number of diagonals and number of straight path
 def distance(cell):
