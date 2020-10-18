@@ -2,11 +2,16 @@ from Map import *
 
 
 def main():
-    make_grid(120, 160)
-    #passed
-    make_hard()
+    make_grid()
     #passed
     
+    #print_grid()
+    #passed
+
+    #make_hard()
+    #passed
+
+     
     make_highway()
     #failed
 
