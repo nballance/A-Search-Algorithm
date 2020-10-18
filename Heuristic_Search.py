@@ -2,50 +2,96 @@ from heapq import heapify, heappush, heappop
 from Map import *
 import math
 WEIGHT = 1
-#Initialize open and closed lists
-#Make the start Vertex current
 
 
-def a_search():
-    current = grid[start[0], start[1]]
-    open_list = []
-    closed_list = []
+# def a_search():
+#     current = grid[start[0], start[1]]
+#     open_list = []
+#     closed_list = []
 
-    heapify(open_list)
+    # heapify(open_list)
 
-    while (current != goal): 
-        neighbors = get_neighbors(current)
-        samePriority = []
-        length = len(neighbors)
-        for i in range(length):
-            cur_neighbor = neighbors[i]
-            if ((neighbors[i] not in closed_list) and (neighbors[i] not in open_list)):
-                heappush(open_list, (neighbors[i].f_cost, neighbors[i]))
-
-        heapify(open)
+    # while (current != goal): 
+    #     neighbors = get_neighbors(current)
+    #     samePriority = []
+    #     length = len(neighbors)
+    #     for i in range(length):
+    #         cur_neighbor = neighbors[i]
+    #         if ((neighbors[i] not in closed_list) and (neighbors[i] not in open_list)):
+    #             calculate_h_val(neighbors[i])
+    #             calculate_g_val(neighbors[i], neighbors[i].parent)
+    #             heappush(open_list, (neighbors[i].f_cost, neighbors[i]))
+                
+    #     heapify(open_list)
                 
 #c              
 
-#Calculate heuristic distance of start vertex to destination (h)
-#Calculate f value for start vertex (f = g + h, where g = 0)
-# |WHILE current vertex is not destination
-# |  FOR Each vertex adjacent to current
-# |  |    IF vertex not in closed list and not in open List THEN
-# |  |    |    Add vertex to open list
-# |  |    |    Calculate distance from start (g)
-# |  |    |    Calculate f value (f = g + h)
-# |  |    |   IF new f value < existing f value or there is no existing f value Then
-# |  |    |    |    Update f value
-# |  |    |    |    Set parent to be current vertex
-# |  |    |    END IF 
-# |  |    END IF
-# |  NEXT adjacent vertex
-# |  Add current vertex to closed list
-# |  Remove vertex to closed list
-# |  Remove vertex with lowest f value from open list and make it current
-# |End WHILE   
+def a_search():
+    open_list = []
+    closed_list = []
 
-#Cost from starting node
+    #Calculate heuristic distance of start vertex to destination (h)
+    grid[start[0], start[1]].g_cost = 0
+    grid[start[0], start[1]].h_cost = calculate_h_val(grid[start[0], start[1]])
+
+    #Calculate f value for start vertex (f = g + h, where g = 0)
+    grid[start[0], start[1]].f_cost = calculate_f_val(grid[start[0], start[1]])
+
+    # |WHILE current vertex is not destination
+    current = grid[start[0], start[1]]
+    destination = grid[goal[0], goal[1]]
+
+    while(current != destination):
+        neighbors = get_neighbors()
+    # |  FOR Each vertex adjacent to current
+        num_neighbors = neighbors.length()
+        for i in range(0, num_neighbors-1):
+        # |  |    IF vertex not in closed list and not in open List THEN
+            if ((neighbors[i] not in closed_list) and (neighbors[i] not in open_list)):
+                
+                neighbors[i].parent = current
+
+            # |  |    |    Calculate distance from start (g)
+                calculate_g_val(neighbors[i])
+            # |  |    |    Calculate distance to goal (h)
+                calculate_h_val(neighbors[i])    
+            # |  |    |    Calculate f value (f = g + h)  
+                calculate_f_val(neighbors[i])  
+            # |  |    |    Add vertex to open list
+                open_list.append(neighbors[i])
+            elif(neighbors[i] in open_list):
+                #see if the new g value is less than the previous g value
+                old_parent = neighbors[i].parent
+                neighbors[i].parent = current
+
+                if(neighbors[i].g_cost <= calculate_g_val(neighbors[i])):
+                    neighbors[i].parent = old_parent
+        heapify(open_list)
+
+    # |  |    |   IF new f value < existing f value or there is no existing f value Then
+    # |  |    |    |    Update f value
+    # |  |    |    |    Set parent to be current vertex
+    # |  |    |    END IF 
+    # |  |    END IF
+
+
+    # |  NEXT adjacent vertex
+        closed_list.append(current)
+    # |  Add current vertex to closed list
+        current = open_list.pop()
+        while(open_list.peak()):
+            next_cell = open_list.peak()
+            if(next_cell.h_cost < current.h_cost):
+                open_list.append(current)
+                current = open_list.pop()
+        heapify(open_list)
+
+    # |  Remove vertex to closed list
+    # |  Remove vertex with lowest f value from open list and make it current
+    # |End WHILE   
+
+
+#Returns the cost from starting node
 def calculate_g_val(cell):
     terrain1 = cell.terrain
     terrain2 = cell.parent.terrain
@@ -82,7 +128,7 @@ def calculate_g_val(cell):
     if(highway):
         cost = cost/4
 
-    grid[cell.row][cell.col].g_cost = cell.parent.g_cost + cost 
+    return cell.parent.g_cost + cost 
     
 
 #Cost to ending node
