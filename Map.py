@@ -17,13 +17,14 @@ TOTAL_BLOCKED = 3840
 
 
 class Cell:
-    def __init__(self, row, col, terrain, g_cost, h_cost, f_cost):
+    def __init__(self, row, col, terrain, g_cost, h_cost, f_cost, parent):
         self.row = row
         self.col = col
         self.terrain = terrain
         self.g_cost = g_cost
         self.h_cost = h_cost
         self.f_cost = f_cost
+        self.parent = parent
         
 def make_grid():
     for column in range (COLS):
@@ -117,8 +118,12 @@ def init_path(temp_grid):
         x = randint(0, COLS-1)
         y = ROWS-1
         direction = 'u'
+
     if temp_grid[x][y].terrain == 'a' or temp_grid[x][y].terrain == 'b':
         return init_path(temp_grid)
+    
+    #printf("starting info: x: ", x, " y: ", y, " dir: ", direction)
+
     return (x, y, direction)
 
 def direct(current_direction):
@@ -162,9 +167,9 @@ def direct(current_direction):
         if vector == 's':
             new_direction = 'd'
         elif vector == 'l':
-            new_direction = 'r'
-        else:
             new_direction = 'l'
+        else:
+            new_direction = 'r'
 
     return new_direction
 
@@ -190,10 +195,10 @@ def moving(direction):
         y = 0
     elif direction == 'u':
         x = 0
-        y = 1
+        y = -1
     else:
         x = 0
-        y = -1
+        y = 1
     return (x, y)
 
 def mark_seg(x, y, direction, temp_grid2):
@@ -203,7 +208,7 @@ def mark_seg(x, y, direction, temp_grid2):
 
 
     for i in range(20):
-        print("coordinates: ", x, y)
+        print("coordinates: ", x, y, " direction: ", direction)
 
         if (x < 0 or x > COLS-1 or y < 0 or y > ROWS-1):
             return i
@@ -219,7 +224,7 @@ def mark_seg(x, y, direction, temp_grid2):
         x += x_inc
         y += y_inc
 
-        
+    print("\n")    
 
     return 20
 
@@ -233,6 +238,7 @@ def make_path(temp_grid, start_point):
     y = start_point[1]
     direction = start_point[2]
 
+    #print("make_path called mark seg: ")
     check = mark_seg(x, y, direction, temp_grid2)
 
     
@@ -243,10 +249,12 @@ def make_path(temp_grid, start_point):
     x = position(x, y, direction, check)[0]
     y = position(x, y, direction, check)[1]
     
+
+
     while cell_count < 100:
         direction = direct(direction)
         check = mark_seg(x, y, direction, temp_grid2)
-        if check == -1:
+        if check == -1 or check == 0:
             return -1
 
         cell_count += check    
@@ -265,7 +273,7 @@ def make_highway():
         check = -1
         
         while check == -1:
-            if path_tries == 9:
+            if path_tries == 15:
                 return -1
 
             start_point = init_path(temp_grid)
@@ -332,30 +340,37 @@ def make_goal(start_x, start_y):
                 #Set the goal at (goal_x, goal_y)
                 return
 
-def get_neighbors(Cell):
-    x = Cell.x
-    y = Cell.y
+def get_neighbors(cell):
+    x = cell.x
+    y = cell.y
     neighbors = []
     
     #Diagonal Neighbors
     if(x-1 > -1) and (y-1 > -1):
-        neighbors.append(grid[x-1][y-1])
+        if(grid[x-1][y-1].terrain != '0'):
+            neighbors.append(grid[x-1][y-1])
     if(x-1 > -1) and (y+1 < 120):
-        neighbors.append(grid[x-1][y+1])
+        if(grid[x-1][y+1].terrain != '0'):
+            neighbors.append(grid[x-1][y+1])
     if(x+1 < 160) and (y-1 > -1):
-        neighbors.append(grid[x+1][y-1])
+        if(grid[x+1][y-1].terrain != '0'):
+            neighbors.append(grid[x+1][y-1])
     if(x+1 < 160) and (y+1 < 120):
-        neighbors.append(grid[x+1][y+1])
+        if(grid[x+1][y+1].terrain != '0'):
+            neighbors.append(grid[x+1][y+1])
     
     #Horizontal/Vertical Neighbors
     if(x-1 > -1):
-        neighbors.append(grid[x-1][y])
+        if(grid[x-1][y].terrain != '0'):
+            neighbors.append(grid[x-1][y])
     if(x+1 < 160):
-        neighbors.append(grid[x+1][y])
+        if(grid[x+1][y].terrain != '0'):
+            neighbors.append(grid[x+1][y])
     if(y-1 > -1):
         neighbors.append(grid[x][y-1])
     if(y+1 < 120):
-        neighbors.append(grid[x][y+1])
+        if(grid[x][y+1].terrain != '0'):
+            neighbors.append(grid[x][y+1])
     
     return neighbors
 
