@@ -15,12 +15,14 @@ def a_search():
 
     while (current != goal): 
         neighbors = get_neighbors(current)
+        samePriority = []
         length = len(neighbors)
         for i in range(length):
             cur_neighbor = neighbors[i]
-            if ((neighbors[i] not in open_list) and (neighbors[i] not in closed_list)):
+            if ((neighbors[i] not in closed_list) and (neighbors[i] not in open_list)):
                 heappush(open_list, (neighbors[i].f_cost, neighbors[i]))
 
+        heapify(open)
                 
 #c              
 
@@ -94,6 +96,10 @@ def calculate_h_val(cell):
 def calculate_f_val(cell):
     cell.f_cost = cell.g_cost + cell.h_cost
     grid[cell[cell.row], cell[cell.col]].f_cost = cell.f_cost
+
+#Number of diagonals and number of straight path
+
+#Number of diagonals and number of straight path
 
 #Number of diagonals and number of straight path
 def distance(cell):
