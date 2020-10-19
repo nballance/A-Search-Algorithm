@@ -1,10 +1,12 @@
 from random import randint
 import math
 from array import *
+from copy import copy, deepcopy
 
 grid = []
-start = []
-goal = []
+start = [None] * 2
+goal = [None] * 2
+hard_traverse_coordinates = [None] * 8
 
 ROWS = 120
 COLS = 160
@@ -30,7 +32,7 @@ def make_grid():
     for column in range (COLS):
         grid.append([])
         for row in range(ROWS):
-            grid[column].append(Cell(column, row, '0', -1, -1, -1))
+            grid[column].append(Cell(column, row, '1', -1, -1, -1, None))
 
     # for row in range (ROWS):
     #     grid.append([])
@@ -45,7 +47,8 @@ def make_hard():
         print(x_hard)
         y_hard = randint(0, (ROWS-1))
         print(y_hard)
-        
+        hard_traverse_coordinates[i] = (x_hard, y_hard)
+        print(hard_traverse_coordinates[i])
         hard_randomize(x_hard, y_hard)
 
 
@@ -120,6 +123,9 @@ def init_path(temp_grid):
         direction = 'u'
 
     if temp_grid[x][y].terrain == 'a' or temp_grid[x][y].terrain == 'b':
+        # print("terrain: ", temp_grid[x][y].terrain)
+        # for i in range(10):
+        #     print("************************************************")
         return init_path(temp_grid)
     
     #printf("starting info: x: ", x, " y: ", y, " dir: ", direction)
@@ -201,6 +207,12 @@ def moving(direction):
         y = 1
     return (x, y)
 
+
+def reached_border(x, y):
+    if x == 0 or x == COLS-1 or y == 0 or y == ROWS-1:
+        return True
+    return False
+
 def mark_seg(x, y, direction, temp_grid2):
     inc = moving(direction)
     x_inc = inc[0]
@@ -208,30 +220,33 @@ def mark_seg(x, y, direction, temp_grid2):
 
 
     for i in range(20):
-        print("coordinates: ", x, y, " direction: ", direction)
-
-        if (x < 0 or x > COLS-1 or y < 0 or y > ROWS-1):
+        
+        if (reached_border(x, y)):
             return i
 
         if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
             return -1
 
-        if temp_grid2[x][y].terrain == '0':
+        
+        if temp_grid2[x][y].terrain == '1':
             temp_grid2[x][y].terrain = 'a'
-        elif temp_grid2[x][y].terrain == '1':
+        elif temp_grid2[x][y].terrain == '2':
             temp_grid2[x][y].terrain = 'b'
+
+        # print("2: coordinates: ", x, y, " direction: ", direction, " terrain: ", temp_grid2[x][y].terrain)
+
 
         x += x_inc
         y += y_inc
 
-    print("\n")    
-
+    # 
+    
     return 20
 
 
 
 def make_path(temp_grid, start_point):
-    temp_grid2 = temp_grid[:]
+    temp_grid2 = deepcopy(temp_grid)
     cell_count = 0
 
     x = start_point[0]
@@ -251,7 +266,7 @@ def make_path(temp_grid, start_point):
     
 
 
-    while cell_count < 100:
+    while cell_count < 100 or (not reached_border(x, y)):
         direction = direct(direction)
         check = mark_seg(x, y, direction, temp_grid2)
         if check == -1 or check == 0:
@@ -261,20 +276,19 @@ def make_path(temp_grid, start_point):
 
         x = position(x, y, direction, check)[0]
         y = position(x, y, direction, check)[1]
-
+    
     return temp_grid2
 
-
-def make_highway():
-    temp_grid = grid[:]
+def create_highway():
+    temp_grid = deepcopy(grid)
     
     for i in range(4):
         path_tries = 0
         check = -1
         
         while check == -1:
-            if path_tries == 15:
-                return -1
+            if path_tries == 10:
+                return create_highway()
 
             start_point = init_path(temp_grid)
             check = make_path(temp_grid, start_point)
@@ -284,60 +298,79 @@ def make_highway():
 
     return temp_grid
 
+def make_highway():
+    global grid 
+    grid = create_highway()
+    return 0
+
+
+
 def make_blocked():
     x_blocked = 0
     y_blocked = 0
     num_blocked = 0
     while(num_blocked < TOTAL_BLOCKED):
-        x_blocked = randint(0, COLS)
-        y_blocked = randint(0, ROWS)
+        x_blocked = randint(0, COLS-1)
+        y_blocked = randint(0, ROWS-1)
 
-        if((grid[x_blocked][y_blocked].terrain != ('a' or 'b'))):
+        if((grid[x_blocked][y_blocked].terrain != 'a') and (grid[x_blocked][y_blocked].terrain != 'b') and (grid[x_blocked][y_blocked].terrain != '0')):
             grid[x_blocked][y_blocked].terrain = '0'
-            num_blocked+=1
+            num_blocked = num_blocked + 1
         
 
 def make_start():
-    is_top = randint(0,1)
-    is_left = randint(0,1)
-    start_x = 0
-    start_y = 0
-    if(is_top):
-        start_y = randint(0, 20)
-    else:
-        start_y = randint(100, 120)
-    if(is_left):
-        start_x = randint(0, 20)
-    else:
-        start_x = randint(140, 160)
+    
     while True:
+        is_top = randint(0,1)
+        is_left = randint(0,1)
+        start_x = 0
+        start_y = 0
+        if(is_top):
+            start_y = randint(0, 20)
+        else:
+            start_y = randint(100, ROWS-1)
+        if(is_left):
+            start_x = randint(0, 20)
+        else:
+            start_x = randint(140, COLS-1)
+
+        #TODO: out of bounds error here sometimes. I'm not sure why
         if(grid[start_x][start_y].terrain != '0'):
             start[0] = start_x
             start[1] = start_y
             return
 
-def make_goal(start_x, start_y):
+def make_goal():
+    start_x = start[0]
+    start_y = start[1]
     goal_x = 0
     goal_y = 0
-    is_top = randint(0,1)
-    is_left = randint(0,1)
-
-    if(is_top):
-        goal_y = randint(0, 20)
-    else:
-        goal_y = randint(100, 120)
-    if(is_left):
-        goal_x = randint(0, 20)
-    else:
-        goal_x = randint(140, 160)
+    
+    
 
     #Set goal, if fail repeat
     while True:
+        is_top = randint(0,1)
+        is_left = randint(0,1)
+
+        if(is_top):
+            goal_y = randint(0, 20)
+        else:
+            goal_y = randint(100, ROWS-1)
+        if(is_left):
+            goal_x = randint(0, 20)
+        else:
+            goal_x = randint(140, COLS-1)
+
+        #TODO: SOmetimes out of bounds. I don't know why
         if(grid[goal_x][goal_y].terrain != '0'):
             distance =  math.sqrt((goal_x - start_x)**2 + (goal_y - start_y)**2)
+            print(distance)
             if(distance >= 100):
                 
                 #Set the goal at (goal_x, goal_y)
+                goal[0] = goal_x
+                goal[1] = goal_y
                 return
 
 def get_neighbors(cell):
@@ -378,33 +411,61 @@ def get_neighbors(cell):
 def print_grid():
     for row in range (ROWS):
         for column in range (COLS):
-            print (grid[column][row].terrain, end = '\t')
+            print (grid[column][row].terrain, end = ' ')
         print("\n")
         
 #Output File for Grid
 def write_grid_file():
     my_file = open("grid_file.txt", "w")
-    my_file.write(start)
-    my_file.write(goal)
-    #for i in range(8):
+    
+    start_str_list = ['(', str(start[0]), ', ', str(start[1]), ')']
+    start_coordinates = "".join(start_str_list)
+    print(start_coordinates)
+    my_file.write(start_coordinates)
 
+    goal_str_list = ['(', str(goal[0]), ', ', str(goal[1]), ')']
+    goal_coordinates = "".join(goal_str_list)
+    my_file.write(goal_coordinates)
+    
+    for i in range(8):
+        string_hard = ''.join(str(hard_traverse_coordinates[i]))
+        my_file.write(string_hard)
+    for rows in range(ROWS):
+        line = grid[rows]
+        for cols in range(COLS):
+               my_file.write(grid[cols][rows].terrain)
+        my_file.write("\n") 
     my_file.close()
-    pass
+    return my_file
 
 #Read File for Grid
+#Ex:
+#(1, 2) -start
+#(3, 2) -goal
+#(1, 2) -1st hard to traverse
+#(7, 2) -2nd hard to traverse
+# ...
+#(4, 3) -8th hard to traverse
+#111...0 -160 characters
 def read_grid_file(file):
     with open(file, 'r') as f:
         start_coordinates = f.readline()
+        start[0] = start_coordinates[1]
+        start[1] = start_coordinates[3]
+        print(start)
 
         goal_coordinates = f.readline()
-        
-        #hard_traverse_coordinates = []
+        goal[0] = goal_coordinates[1]
+        goal[1] = goal_coordinates[3]
+        print(goal)
+
         for i in range(8):
-            #Take coordinates and randomize in 31x31
-            hard_randomize(f.readline())
+            #Take coordinates for centers and put them in a tuple
+            hard_traverse_coordinates.append(f.readline())
+            
             #hard_traverse_coordinates.append(f.readline())
         #make_grid(ROWS, COLS)
         for rows in range(ROWS):
             line = f.readline()
             for cols in range(COLS):
-               grid[rows][cols].terrain = line[cols] 
+               grid[cols][rows].terrain = line[cols] 
