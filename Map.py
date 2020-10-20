@@ -99,209 +99,209 @@ def hard_randomize(x_hard, y_hard):
 
 
         
-def init_path(temp_grid):
-    x = 0
-    y = 0
-    direction = ''
-    side = randint(1, 4)
+# def init_path(temp_grid):
+#     x = 0
+#     y = 0
+#     direction = ''
+#     side = randint(1, 4)
     
-    if side == 1:
-        x = 0
-        y = randint(0, ROWS-1)
-        direction = 'r'
-    elif side == 2:
-        x = COLS-1
-        y = randint(0, ROWS-1)
-        direction = 'l'
-    elif side == 3:
-        x = randint(0, COLS-1)
-        y = 0
-        direction = 'd'
-    else:
-        x = randint(0, COLS-1)
-        y = ROWS-1
-        direction = 'u'
+#     if side == 1:
+#         x = 0
+#         y = randint(0, ROWS-1)
+#         direction = 'r'
+#     elif side == 2:
+#         x = COLS-1
+#         y = randint(0, ROWS-1)
+#         direction = 'l'
+#     elif side == 3:
+#         x = randint(0, COLS-1)
+#         y = 0
+#         direction = 'd'
+#     else:
+#         x = randint(0, COLS-1)
+#         y = ROWS-1
+#         direction = 'u'
 
-    if temp_grid[x][y].terrain == 'a' or temp_grid[x][y].terrain == 'b':
-        # print("terrain: ", temp_grid[x][y].terrain)
-        # for i in range(10):
-        #     print("************************************************")
-        return init_path(temp_grid)
+#     if temp_grid[x][y].terrain == 'a' or temp_grid[x][y].terrain == 'b':
+#         # print("terrain: ", temp_grid[x][y].terrain)
+#         # for i in range(10):
+#         #     print("************************************************")
+#         return init_path(temp_grid)
     
-    #printf("starting info: x: ", x, " y: ", y, " dir: ", direction)
+#     #printf("starting info: x: ", x, " y: ", y, " dir: ", direction)
 
-    return (x, y, direction)
+#     return (x, y, direction)
 
-def direct(current_direction):
+# def direct(current_direction):
 
-    vector = ''
-    prob = randint(0, 100)
-    new_direction = ''
+#     vector = ''
+#     prob = randint(0, 100)
+#     new_direction = ''
 
-    if(prob >= 0 and prob < 60):
-        vector = 's'
-    elif(prob >= 60 and prob < 80):
-        vector = 'l'
-    else:
-        vector = 'r'
+#     if(prob >= 0 and prob < 60):
+#         vector = 's'
+#     elif(prob >= 60 and prob < 80):
+#         vector = 'l'
+#     else:
+#         vector = 'r'
 
-    if current_direction == 'l':
-        if vector == 's':
-            new_direction = 'l'
-        elif vector == 'l':
-            new_direction = 'd'
-        else:
-            new_direction = 'u'
+#     if current_direction == 'l':
+#         if vector == 's':
+#             new_direction = 'l'
+#         elif vector == 'l':
+#             new_direction = 'd'
+#         else:
+#             new_direction = 'u'
 
-    elif current_direction == 'r':
-        if vector == 's':
-            new_direction = 'r'
-        elif vector == 'l':
-            new_direction = 'u'
-        else:
-            new_direction = 'd'
+#     elif current_direction == 'r':
+#         if vector == 's':
+#             new_direction = 'r'
+#         elif vector == 'l':
+#             new_direction = 'u'
+#         else:
+#             new_direction = 'd'
 
-    elif current_direction == 'u':
-        if vector == 's':
-            new_direction = 'u'
-        elif vector == 'l':
-            new_direction = 'l'
-        else:
-            new_direction = 'r'
+#     elif current_direction == 'u':
+#         if vector == 's':
+#             new_direction = 'u'
+#         elif vector == 'l':
+#             new_direction = 'l'
+#         else:
+#             new_direction = 'r'
 
-    else:
-        if vector == 's':
-            new_direction = 'd'
-        elif vector == 'l':
-            new_direction = 'l'
-        else:
-            new_direction = 'r'
+#     else:
+#         if vector == 's':
+#             new_direction = 'd'
+#         elif vector == 'l':
+#             new_direction = 'l'
+#         else:
+#             new_direction = 'r'
 
-    return new_direction
+#     return new_direction
 
-def position(x, y, direction, inc):
+# def position(x, y, direction, inc):
 
-    if direction == 'd':
-        y += inc
-    elif direction == 'u':
-        y -= inc
-    elif direction == 'l':
-        x -= inc
-    else:
-        x += inc
+#     if direction == 'd':
+#         y += inc
+#     elif direction == 'u':
+#         y -= inc
+#     elif direction == 'l':
+#         x -= inc
+#     else:
+#         x += inc
 
-    return (x, y)
+#     return (x, y)
 
-def moving(direction):
-    if direction == 'l':
-        x = -1
-        y = 0
-    elif direction == 'r':
-        x = 1
-        y = 0
-    elif direction == 'u':
-        x = 0
-        y = -1
-    else:
-        x = 0
-        y = 1
-    return (x, y)
-
-
-def reached_border(x, y):
-    if x == 0 or x == COLS-1 or y == 0 or y == ROWS-1:
-        return True
-    return False
-
-def mark_seg(x, y, direction, temp_grid2):
-    inc = moving(direction)
-    x_inc = inc[0]
-    y_inc = inc[1]
+# def moving(direction):
+#     if direction == 'l':
+#         x = -1
+#         y = 0
+#     elif direction == 'r':
+#         x = 1
+#         y = 0
+#     elif direction == 'u':
+#         x = 0
+#         y = -1
+#     else:
+#         x = 0
+#         y = 1
+#     return (x, y)
 
 
-    for i in range(20):
+# def reached_border(x, y):
+#     if x == 0 or x == COLS-1 or y == 0 or y == ROWS-1:
+#         return True
+#     return False
+
+# def mark_seg(x, y, direction, temp_grid2):
+#     inc = moving(direction)
+#     x_inc = inc[0]
+#     y_inc = inc[1]
+
+
+#     for i in range(20):
         
-        if (reached_border(x, y)):
-            return i
+#         if (reached_border(x, y)):
+#             return i
 
-        if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
-            return -1
+#         if temp_grid2[x][y].terrain == 'a' or temp_grid2[x][y].terrain == 'b':
+#             return -1
 
         
-        if temp_grid2[x][y].terrain == '1':
-            temp_grid2[x][y].terrain = 'a'
-        elif temp_grid2[x][y].terrain == '2':
-            temp_grid2[x][y].terrain = 'b'
+#         if temp_grid2[x][y].terrain == '1':
+#             temp_grid2[x][y].terrain = 'a'
+#         elif temp_grid2[x][y].terrain == '2':
+#             temp_grid2[x][y].terrain = 'b'
 
-        # print("2: coordinates: ", x, y, " direction: ", direction, " terrain: ", temp_grid2[x][y].terrain)
+#         # print("2: coordinates: ", x, y, " direction: ", direction, " terrain: ", temp_grid2[x][y].terrain)
 
 
-        x += x_inc
-        y += y_inc
+#         x += x_inc
+#         y += y_inc
 
-    # 
+#     # 
     
-    return 20
+#     return 20
 
 
 
-def make_path(temp_grid, start_point):
-    temp_grid2 = deepcopy(temp_grid)
-    cell_count = 0
+# def make_path(temp_grid, start_point):
+#     temp_grid2 = deepcopy(temp_grid)
+#     cell_count = 0
 
-    x = start_point[0]
-    y = start_point[1]
-    direction = start_point[2]
+#     x = start_point[0]
+#     y = start_point[1]
+#     direction = start_point[2]
 
-    #print("make_path called mark seg: ")
-    check = mark_seg(x, y, direction, temp_grid2)
+#     #print("make_path called mark seg: ")
+#     check = mark_seg(x, y, direction, temp_grid2)
 
     
-    if check == -1:
-        return -1
-    cell_count += check    
+#     if check == -1:
+#         return -1
+#     cell_count += check    
 
-    x = position(x, y, direction, check)[0]
-    y = position(x, y, direction, check)[1]
+#     x = position(x, y, direction, check)[0]
+#     y = position(x, y, direction, check)[1]
     
 
 
-    while cell_count < 100 or (not reached_border(x, y)):
-        direction = direct(direction)
-        check = mark_seg(x, y, direction, temp_grid2)
-        if check == -1 or check == 0:
-            return -1
+#     while cell_count < 100 or (not reached_border(x, y)):
+#         direction = direct(direction)
+#         check = mark_seg(x, y, direction, temp_grid2)
+#         if check == -1 or check == 0:
+#             return -1
 
-        cell_count += check    
+#         cell_count += check    
 
-        x = position(x, y, direction, check)[0]
-        y = position(x, y, direction, check)[1]
+#         x = position(x, y, direction, check)[0]
+#         y = position(x, y, direction, check)[1]
     
-    return temp_grid2
+#     return temp_grid2
 
-def create_highway():
-    temp_grid = deepcopy(grid)
+# def create_highway():
+#     temp_grid = deepcopy(grid)
     
-    for i in range(4):
-        path_tries = 0
-        check = -1
+#     for i in range(4):
+#         path_tries = 0
+#         check = -1
         
-        while check == -1:
-            if path_tries == 10:
-                return create_highway()
+#         while check == -1:
+#             if path_tries == 10:
+#                 return create_highway()
 
-            start_point = init_path(temp_grid)
-            check = make_path(temp_grid, start_point)
-            path_tries += 1
+#             start_point = init_path(temp_grid)
+#             check = make_path(temp_grid, start_point)
+#             path_tries += 1
 
-        temp_grid = check
+#         temp_grid = check
 
-    return temp_grid
+#     return temp_grid
 
-def make_highway():
-    global grid 
-    grid = create_highway()
-    return 0
+# def make_highway():
+#     global grid 
+#     grid = create_highway()
+#     return 0
 
 
 
@@ -469,3 +469,162 @@ def read_grid_file(file):
             line = f.readline()
             for cols in range(COLS):
                grid[cols][rows].terrain = line[cols] 
+
+def choose_highway_start():
+    side = randint(0, 3)
+    x_coordinate = -1
+    y_coordinate = -1
+    direction = '-'
+
+    if(side == 0): #moving left
+        x_coordinate = COLS-1
+        y_coordinate = randint(0, (ROWS-1))
+        direction = 0 #left
+    elif(side == 1): #moving up
+        x_coordinate = randint(0, (COLS - 1))
+        y_coordinate = ROWS-1
+        direction = 1 #up
+    elif(side == 2): #moving right
+        x_coordinate = 0
+        y_coordinate = randint(0, (ROWS-1))
+        direction = 2 #right
+    else: #moving down
+        x_coordinate = randint(0, (COLS - 1))
+        y_coordinate = 0
+        direction = 3 #down
+    
+    start = (x_coordinate, y_coordinate, direction)
+    return start
+
+
+def design_all_highways():
+    fail_counter = 0
+    num_highways = 0
+    while(num_highways<4):
+        highway_coordinates = design_highway()
+        # print(highway_coordinates)
+        if(highway_coordinates == False):
+            fail_counter = fail_counter + 1
+            if(fail_counter >= 10):
+                reset_all_highways()
+                num_highways = 0
+        else:
+            num_highways = num_highways + 1
+
+def design_highway():
+    start_data = choose_highway_start()
+    start_coordinate = (start_data[0], start_data[1])
+    direction = start_data[2]
+
+    highway_length = 0
+    highway_coordinates = []
+
+    x = start_coordinate[0]
+    y = start_coordinate[1]
+    while(True):
+        #check and set terrain
+        if(grid[x][y].terrain == 'a' or grid[x][y].terrain == 'b'):
+            reset_highway(highway_coordinates)
+            return False
+        elif(grid[x][y].terrain == '1'):
+            grid[x][y].terrain = 'a'
+        elif(grid[x][y].terrain == '2'):
+            grid[x][y].terrain = 'b'
+        highway_coordinates.append((x, y))
+        highway_length = highway_length + 1
+        if(highway_length >= 20):
+            break
+
+        if(direction == 0):
+            x = x-1
+        elif(direction == 1):
+            y = y-1
+        elif(direction == 2):
+            x = x+1
+        elif(direction == 3):
+            y = y+1
+        
+
+
+    print("Time to turn boyo")
+    while(True):
+        #We double count the elbows in the highway
+        highway_length = highway_length + 1
+
+        #Choose direction
+        probability = randint(1, 100)
+        if(probability <= 60):
+            pass
+        elif(probability > 60 and probability <= 80): #turn right
+            if(direction == 3):
+                direction = 0
+            else:
+                direction = direction + 1
+        else: #turn left
+            if(direction == 0):
+                direction = 3
+            else:
+                direction = direction - 1
+
+        #Get off elbow square
+        if(direction == 0):
+            x = x-1
+        elif(direction == 1):
+            y = y-1
+        elif(direction == 2):
+            x = x+1
+        elif(direction == 3):
+            y = y+1
+            
+        count = 0
+        while(True):
+            if(grid[x][y].terrain == 'a' or grid[x][y].terrain == 'b'):
+                reset_highway(highway_coordinates)
+                return False
+            elif(grid[x][y].terrain == '1'):
+                grid[x][y].terrain = 'a'
+            elif(grid[x][y].terrain == '2'):
+                grid[x][y].terrain = 'b'
+            highway_coordinates.append((x, y))
+            highway_length = highway_length + 1
+            if((x == 0) or (x == (COLS - 1)) or (y == 0) or (y == (ROWS - 1))):
+                if(highway_length >= 100):
+                    return highway_coordinates
+                else:
+                    reset_highway(highway_coordinates)
+                    return False
+            if(count >= 20):
+                break
+
+            if(direction == 0):
+                x = x-1
+            elif(direction == 1):
+                y = y-1
+            elif(direction == 2):
+                x = x+1
+            elif(direction == 3):
+                y = y+1
+            count = count+1
+            
+
+def reset_highway(highway_coordinates):
+    num_coordinates = len(highway_coordinates)
+    x_coordinate = -1
+    y_coordinate = -1
+    for i in range (num_coordinates):
+        x_coordinate = highway_coordinates[i][0]
+        y_coordinate = highway_coordinates[i][1]
+        if(grid[x_coordinate][y_coordinate].terrain == 'a'):
+            grid[x_coordinate][y_coordinate].terrain = '1'
+        elif(grid[x_coordinate][y_coordinate].terrain == 'b'):
+            grid[x_coordinate][y_coordinate].terrain = '2'
+
+#Lazy approach is iterate through grid and reset all a's to 1 and b's to 2
+#Other approach is using the highway tuple, but I don't feel like getting that to work rn
+def reset_all_highways():
+    for row in range (ROWS):
+        for column in range (COLS):
+            if(grid[column][row].terrain == 'a'):
+                grid[column][row].terrain = '1'
+            elif(grid[column][row].terrain == 'b'):
+                grid[column][row].terrain = '2'
