@@ -470,6 +470,8 @@ def read_grid_file(file):
             for cols in range(COLS):
                grid[cols][rows].terrain = line[cols] 
 
+
+#I didn't allow Corner Squares
 def choose_highway_start():
     side = randint(0, 3)
     x_coordinate = -1
@@ -478,18 +480,18 @@ def choose_highway_start():
 
     if(side == 0): #moving left
         x_coordinate = COLS-1
-        y_coordinate = randint(0, (ROWS-1))
+        y_coordinate = randint(1, (ROWS-2))
         direction = 0 #left
     elif(side == 1): #moving up
-        x_coordinate = randint(0, (COLS - 1))
+        x_coordinate = randint(1, (COLS - 2))
         y_coordinate = ROWS-1
         direction = 1 #up
     elif(side == 2): #moving right
         x_coordinate = 0
-        y_coordinate = randint(0, (ROWS-1))
+        y_coordinate = randint(1, (ROWS-2))
         direction = 2 #right
     else: #moving down
-        x_coordinate = randint(0, (COLS - 1))
+        x_coordinate = randint(1, (COLS - 2))
         y_coordinate = 0
         direction = 3 #down
     
