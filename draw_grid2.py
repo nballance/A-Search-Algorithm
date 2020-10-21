@@ -13,8 +13,8 @@ YELLOW = (255, 255, 0)
 LIGHT_BLUE = (173,216,230)
 
 # Screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 950
  
  
 class Player(pygame.sprite.Sprite):
@@ -155,8 +155,8 @@ class current_map(Map):
  
         
         
-        cell_width = 20
-        cell_height = 20
+        cell_width = 8
+        cell_height = 8
 
         for row in range(ROWS):
             for col in range(COLS):
