@@ -8,10 +8,10 @@ start = [None] * 2
 goal = [None] * 2
 hard_traverse_coordinates = [None] * 8
 
-ROWS = 120
-COLS = 160
-# ROWS = 2
-# COLS = 3
+# ROWS = 120
+# COLS = 160
+ROWS = 4
+COLS = 7
 
 
 
@@ -19,7 +19,7 @@ TOTAL_BLOCKED = 3840
 
 
 class Cell:
-    def __init__(self, row, col, terrain, g_cost, h_cost, f_cost, parent):
+    def __init__(self, col, row, terrain, g_cost, h_cost, f_cost, parent):
         self.row = row
         self.col = col
         self.terrain = terrain
@@ -33,6 +33,7 @@ def make_grid():
         grid.append([])
         for row in range(ROWS):
             grid[column].append(Cell(column, row, '1', -1, -1, -1, None))
+            # grid[column].append(Cell(row, column, '1', -1, -1, -1, None))
 
     # for row in range (ROWS):
     #     grid.append([])
@@ -373,22 +374,20 @@ def make_goal():
                 goal[1] = goal_y
                 return
 
-def get_neighbors(cell):
-    x = cell.x
-    y = cell.y
+def get_neighbors(x, y):
     neighbors = []
     
     #Diagonal Neighbors
     if(x-1 > -1) and (y-1 > -1):
         if(grid[x-1][y-1].terrain != '0'):
             neighbors.append(grid[x-1][y-1])
-    if(x-1 > -1) and (y+1 < 120):
+    if(x-1 > -1) and (y+1 < ROWS):
         if(grid[x-1][y+1].terrain != '0'):
             neighbors.append(grid[x-1][y+1])
-    if(x+1 < 160) and (y-1 > -1):
+    if(x+1 < COLS) and (y-1 > -1):
         if(grid[x+1][y-1].terrain != '0'):
             neighbors.append(grid[x+1][y-1])
-    if(x+1 < 160) and (y+1 < 120):
+    if(x+1 < COLS) and (y+1 < ROWS):
         if(grid[x+1][y+1].terrain != '0'):
             neighbors.append(grid[x+1][y+1])
     
@@ -396,12 +395,13 @@ def get_neighbors(cell):
     if(x-1 > -1):
         if(grid[x-1][y].terrain != '0'):
             neighbors.append(grid[x-1][y])
-    if(x+1 < 160):
+    if(x+1 < COLS):
         if(grid[x+1][y].terrain != '0'):
             neighbors.append(grid[x+1][y])
     if(y-1 > -1):
-        neighbors.append(grid[x][y-1])
-    if(y+1 < 120):
+        if(grid[x][y-1].terrain != '0'):
+            neighbors.append(grid[x][y-1])
+    if(y+1 < ROWS):
         if(grid[x][y+1].terrain != '0'):
             neighbors.append(grid[x][y+1])
     
