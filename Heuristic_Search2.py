@@ -1,7 +1,10 @@
 from heapq import *
+from operator import index
 from Map import *
 import math
 from queue import PriorityQueue
+
+import operator
 
 
 
@@ -52,7 +55,9 @@ def a_search_standard():
 
 
 def a_search(weight):
+
     open_list = []
+    
     closed_list = []
     
     # x_start = int(start[0])
@@ -66,10 +71,10 @@ def a_search(weight):
 
     #Calculate heuristic distance of start vertex to destination (h)
     grid[x_start][y_start].g_cost = 0
-    calculate_h_val(x_start, y_start, weight)
+    grid[x_start][y_start].h_cost =calculate_h_val(x_start, y_start, weight)
 
     #Calculate f value for start vertex (f = g + h, where g = 0)
-    calculate_f_val(x_start, y_start)
+    grid[x_start][y_start].f_cost = calculate_f_val(x_start, y_start)
 
     # |WHILE current vertex is not destination
     current = grid[x_start][y_start]
@@ -77,7 +82,7 @@ def a_search(weight):
 
     while(current is not (destination)):
     # while(current.row != x_goal and current.col != y_goal):
-        neighbors = get_neighbors(current.row, current.col)
+        neighbors = get_neighbors(current.col, current.row)
         
         # print("Current Cell: ", current.row, current.col, x_start, y_start)
         # for i in range (len(neighbors)):
@@ -89,6 +94,7 @@ def a_search(weight):
         # print("The Number of Neighbors: ", num_neighbors)
         
         for i in range (num_neighbors):
+            index_in_open = -1
         # |  |    IF vertex not in closed list and not in open List THEN
             in_closed = False
             in_open = False
@@ -96,48 +102,97 @@ def a_search(weight):
 
                 if((neighbors[i].row == closed_list[j].row) and (neighbors[i].col == closed_list[j].col)):
                     in_closed = True
+                    break
             for j in range(len(open_list)):
-                if(neighbors[i].row == open_list[j].get('cell').row and (neighbors[i].col == open_list[j].get('cell').col)):
+                # if(neighbors[i].row == open_list[j].get('cell').row and (neighbors[i].col == open_list[j].get('cell').col)):
+                if(neighbors[i].row == open_list[j][0].row and neighbors[i].col == open_list[j][0].col):
+                    index_in_open = j
                     in_open = True
+                    break
             # if ((neighbors[i] not in closed_list) and (neighbors[i] not in open_list)):
             if(not in_open and not in_closed):    
-                neighbors[i].parent = current
+                row_num = neighbors[i].row
+                col_num = neighbors[i].col
+                grid[col_num][row_num].parent = current
+
+                # neighbors[i].parent = current
 
             # |  |    |    Calculate distance from start (g)
-                calculate_g_val(neighbors[i].row, neighbors[i].col)
+                neighbors[i].g_cost = calculate_g_val(neighbors[i].col, neighbors[i].row)
+
             # |  |    |    Calculate distance to goal (h)
-                calculate_h_val(neighbors[i].row, neighbors[i].col, weight)    
+                neighbors[i].h_cost = calculate_h_val(neighbors[i].col, neighbors[i].row, weight)    
             # |  |    |    Calculate f value (f = g + h)  
-                calculate_f_val(neighbors[i].row, neighbors[i].col)  
+                neighbors[i].f_cost = calculate_f_val(neighbors[i].col, neighbors[i].row)  
             # |  |    |    Add vertex to open list
-                open_list.append( {'cell': neighbors[i], 'f': neighbors[i].f_cost})
+                # open_list.append( {'cell': neighbors[i], 'f': neighbors[i].f_cost, 'h': neighbors[i].h_cost})
+                open_list.append((neighbors[i], neighbors[i].f_cost, neighbors[i].h_cost))
             
             elif(in_open):
                 #see if the new f value is less than the previous f value
                 #See if the new h val is less than prev
                 old_h_val = neighbors[i].h_cost
                 old_f_val = neighbors[i].f_cost
+                old_g_val = neighbors[i].g_cost
+                old_parent = neighbors[i].parent
 
-                calculate_h_val(neighbors[i].row, neighbors[i].col, weight)
-                calculate_g_val(neighbors[i].row, neighbors[i].col)
-                calculate_f_val(neighbors[i].row, neighbors[i].col)
+                row_num = neighbors[i].row
+                col_num = neighbors[i].col
+                grid[col_num][row_num].parent = current
+
+                neighbors[i].parent = current
+                neighbors[i].h_cost = calculate_h_val(neighbors[i].col, neighbors[i].row, weight)
+                neighbors[i].g_cost = calculate_g_val(neighbors[i].col, neighbors[i].row)
+                neighbors[i].f_cost = calculate_f_val(neighbors[i].col, neighbors[i].row)
                 
+                #update f val in open list
                 if(neighbors[i].f_cost < old_f_val):
                     neighbors[i].parent = current
-                                        
-                    open_list.append( {'cell': neighbors[i], 'f': neighbors[i].f_cost})
+                    open_list.remove(open_list[index_in_open])                 
+                    open_list.append((neighbors[i], neighbors[i].f_cost, neighbors[i].h_cost))
                 elif(neighbors[i].f_cost == old_f_val):
                     if(neighbors[i].h_cost < old_h_val):
                         neighbors[i].parent = current
                         #update the old h value of cell that has the same f value
-                        open_list.append({'cell': neighbors[i], 'f': neighbors[i].f_cost})
+                        # open_list.append({'cell': neighbors[i], 'f': neighbors[i].f_cost, 'h': neighbors[i].h_cost})
+                        open_list.remove(open_list[index_in_open])                 
+                        open_list.append((neighbors[i], neighbors[i].f_cost, neighbors[i].h_cost))
+                    else:
+                        row_num = neighbors[i].row
+                        col_num = neighbors[i].col
+
+                        neighbors[i].parent = old_parent
+                        grid[col_num][row_num].parent = old_parent
+                        neighbors[i].h_cost = old_h_val
+                        grid[col_num][row_num].h_cost = old_h_val
+                        neighbors[i].g_cost = old_g_val
+                        grid[col_num][row_num].g_cost = old_g_val
+                        neighbors[i].f_cost = old_f_val
+                        grid[col_num][row_num].f_cost = old_f_val
+                else:
+                    row_num = neighbors[i].row
+                    col_num = neighbors[i].col
+
+                    neighbors[i].parent = old_parent
+                    grid[col_num][row_num].parent = old_parent
+                    neighbors[i].h_cost = old_h_val
+                    grid[col_num][row_num].h_cost = old_h_val
+                    neighbors[i].g_cost = old_g_val
+                    grid[col_num][row_num].g_cost = old_g_val
+                    neighbors[i].f_cost = old_f_val
+                    grid[col_num][row_num].f_cost = old_f_val
+
+
 
         closed_list.append(current)
   
         # sorted(open_list, key=mySort)
-        open_list.sort(reverse=True, key=mySort)
-        current  = open_list.pop().get('cell')
-        
+        # open_list.sort(reverse=False, key=mySort)
+        open_list.sort(key = operator.itemgetter(1, 2))
+        # current  = open_list.pop().get('cell')
+        # current_tuple = open_list.remove(open_list[0])
+        current = open_list[0][0]
+        open_list.remove(open_list[0])        
 
     # |  Remove vertex to closed list
     # |  Remove vertex with lowest f value from open list and make it current
@@ -151,6 +206,7 @@ def a_search(weight):
 
 
 def mySort(Cell):
+    #Sorts by f, need to sort by h too
     return Cell['f']
 
 def path_coordinates(x_goal, y_goal):
@@ -158,7 +214,7 @@ def path_coordinates(x_goal, y_goal):
     path = []
     while(current is not None):
         path.append((current.row, current.col))
-        print("X of current: ", current.row, "Y of current: ", current.col)
+        print("X of current: ", current.col, "Y of current: ", current.row)
         
         current = current.parent
     return path
@@ -177,7 +233,7 @@ def calculate_g_val(x, y):
     cost = 0
 
     #Diagonal or not
-    if((x != grid[x][y].parent.row) and (y != grid[x][y].parent.col)):
+    if((x != grid[x][y].parent.col) and (y != grid[x][y].parent.row)):
         diagonal = True
 
     if((terrain1 == 'a' or terrain1 =='b') and (terrain2 == 'a' or terrain2 =='b')):
@@ -193,7 +249,8 @@ def calculate_g_val(x, y):
     #Regular to Hard/Hard to Regular
     if(((terrain1 == '1' or terrain1 =='a') and (terrain2 == '2' or terrain2 =='b')) or ((terrain1 == '2' or terrain1 =='b') and (terrain2 == '1' or terrain2 =='a'))):
         if(diagonal):
-            cost = (math.sqrt(2) + math.sqrt(8)) /2
+            cost = ((math.sqrt(2) + math.sqrt(8)) /2)
+            #Should be 2.1213
         else:
             cost = 1.5 
     #Hard to Hard
@@ -205,23 +262,29 @@ def calculate_g_val(x, y):
     if(highway):
         cost = cost/4
 
-    grid[x][y].g_cost = grid[x][y].parent.g_cost + cost 
+    g_val_variable = round((grid[x][y].parent.g_cost + cost), 5)
+    grid[x][y].g_cost = g_val_variable
+    return grid[x][y].g_cost
     
 
 #Cost to ending node
 def calculate_h_val(x, y, weight):
     distance_to_goal = distance(x, y)
-    # print("Num diagonals: ", distance_to_goal[0], "Num straights: ", distance_to_goal[1])
-    # print(distance_to_goal)
-    grid[x][y].h_cost = (distance_to_goal[0] * weight * math.sqrt(2) + distance_to_goal[1] * weight)
-    # print(grid[x][y].h_cost) 
-    # grid[cell[cell.row], cell[cell.col]].h_cost = cell.h_cost
+
+    print(distance_to_goal)
+    
+    h_val_variable = round(distance_to_goal[0] * weight * math.sqrt(2) + distance_to_goal[1] * weight, 5)
+    grid[x][y].h_cost = h_val_variable
+    
+    return grid[x][y].h_cost
 
 #G Cost + H Cost
 #Check parent
 def calculate_f_val(x, y):
-    grid[x][y].f_cost = grid[x][y].g_cost + grid[x][y].h_cost
+    f_val_variable = round(grid[x][y].g_cost + grid[x][y].h_cost, 5)
+    grid[x][y].f_cost = f_val_variable
     # grid[cell[cell.row], cell[cell.col]].f_cost = cell.f_cost
+    return grid[x][y].f_cost
 
 #Number of diagonals and number of straight path
 def distance(x, y):
