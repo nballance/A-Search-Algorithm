@@ -8,10 +8,12 @@ start = [None] * 2
 goal = [None] * 2
 hard_traverse_coordinates = [None] * 8
 
-# ROWS = 120
-# COLS = 160
-ROWS = 4
-COLS = 7
+paths = []
+
+ROWS = 120
+COLS = 160
+# ROWS = 4
+# COLS = 7
 
 
 
@@ -45,11 +47,8 @@ def make_hard():
     y_hard = 0
     for i in range(8):
         x_hard = randint(0, (COLS-1))
-        print(x_hard)
         y_hard = randint(0, (ROWS-1))
-        print(y_hard)
         hard_traverse_coordinates[i] = (x_hard, y_hard)
-        print(hard_traverse_coordinates[i])
         hard_randomize(x_hard, y_hard)
 
 
@@ -64,7 +63,6 @@ def hard_randomize(x_hard, y_hard):
                 if(y < ROWS):
                     is_hard = randint(0, 1)
                     if(is_hard == 0):
-                        print("Coordinate: ", x, " ", y)
                         grid[x][y].terrain = '2'
 
     #Top Right
@@ -366,7 +364,6 @@ def make_goal():
         #TODO: SOmetimes out of bounds. I don't know why
         if(grid[goal_x][goal_y].terrain != '0'):
             distance =  math.sqrt((goal_x - start_x)**2 + (goal_y - start_y)**2)
-            print(distance)
             if(distance >= 100):
                 
                 #Set the goal at (goal_x, goal_y)
@@ -546,9 +543,6 @@ def design_highway():
         elif(direction == 3):
             y = y+1
         
-
-
-    print("Time to turn boyo")
     while(True):
         #We double count the elbows in the highway
         highway_length = highway_length + 1
