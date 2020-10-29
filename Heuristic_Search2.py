@@ -9,8 +9,8 @@ import operator
 
 
 A_WEIGHT = 1     
-start = (0, 0)
-goal = (6, 3)
+# start = (0, 0)
+# goal = (6, 3)
 
 
 #Uniform Cost Search
@@ -60,14 +60,17 @@ def a_search(weight):
     
     closed_list = []
     
-    # x_start = int(start[0])
-    x_start = 0
-    y_start = 0
-    x_goal = 6
-    y_goal = 3
-    # y_start = int(start[1])
-    # x_goal = goal[0]
-    # y_goal = goal[1]
+    x_start = start[0]
+    y_start = start[1]
+    x_goal = goal[0]
+    y_goal = goal[1]
+
+    # print("x_start: ", x_start)
+    # print("y_start: ", y_start)
+    # print("x_goal: ", x_goal)
+    # print("y_goal: ", y_goal)
+
+    
 
     #Calculate heuristic distance of start vertex to destination (h)
     grid[x_start][y_start].g_cost = 0
@@ -211,13 +214,15 @@ def mySort(Cell):
 
 def path_coordinates(x_goal, y_goal):
     current = grid[x_goal][y_goal]
-    path = []
+    
     while(current is not None):
-        path.append((current.row, current.col))
+        paths.append((current.col, current.row))
+        # path.append((current.row, current.col))
+
         print("X of current: ", current.col, "Y of current: ", current.row)
         
         current = current.parent
-    return path
+    # return path
 
 #Returns the cost from starting node
 #set parent before calculate_g_val is called
@@ -271,7 +276,7 @@ def calculate_g_val(x, y):
 def calculate_h_val(x, y, weight):
     distance_to_goal = distance(x, y)
 
-    print(distance_to_goal)
+    # print(distance_to_goal)
     
     h_val_variable = round(distance_to_goal[0] * weight * math.sqrt(2) + distance_to_goal[1] * weight, 5)
     grid[x][y].h_cost = h_val_variable
