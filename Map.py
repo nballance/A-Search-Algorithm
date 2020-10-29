@@ -412,8 +412,8 @@ def print_grid():
         print("\n")
         
 #Output File for Grid
-def write_grid_file():
-    my_file = open("grid_file.txt", "w")
+def write_grid_file(name):
+    my_file = open(name, "w")
     
     start_str_list = ['(', str(start[0]), ', ', str(start[1]), ')']
     start_coordinates = "".join(start_str_list)
@@ -447,13 +447,22 @@ def write_grid_file():
 def read_grid_file(file):
     with open(file, 'r') as f:
         start_coordinates = f.readline()
-        start[0] = start_coordinates[1]
-        start[1] = start_coordinates[3]
+
+        end = start_coordinates.find(',')
+        start[0] = int(start_coordinates[1:end])
+
+        end2 = start_coordinates.find(')')
+        start[1] = int(start_coordinates[end+2:end2])
         print(start)
 
+
         goal_coordinates = f.readline()
-        goal[0] = goal_coordinates[1]
-        goal[1] = goal_coordinates[3]
+
+        end = goal_coordinates.find(',')
+        goal[0] = int(goal_coordinates[1:end])
+
+        end2 = goal_coordinates.find(')')
+        goal[1] = int(goal_coordinates[end+2:end2])
         print(goal)
 
         for i in range(8):
@@ -465,7 +474,7 @@ def read_grid_file(file):
         for rows in range(ROWS):
             line = f.readline()
             for cols in range(COLS):
-               grid[cols][rows].terrain = line[cols] 
+                grid[cols][rows].terrain = line[cols] 
 
 
 #I didn't allow Corner Squares
