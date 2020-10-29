@@ -3,7 +3,7 @@ from Draw_Grid import *
 # from A_Star_Test import *
 # from Heuristic_Search import *
 from Heuristic_Search2 import *
-
+import sys
 
 def main():
     print("Would you like to read in a file? ('1' for yes and '2' for no)")
@@ -14,7 +14,14 @@ def main():
         if(response_int == 1):
             
             #open_file()
-            read_grid_file()
+            print("Enter the name of the file.")
+            file_name = input()
+
+            make_grid()
+
+            read_grid_file(file_name)
+
+            draw_grid(False)
 
         elif(response_int == 2):
             make_grid()
