@@ -7,12 +7,14 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
-GRAY = (212, 212, 212)
+GRAY = (128, 128, 128)
 BLUE = (0, 0, 255)
- 
+YELLOW = (255, 255, 0)
+LIGHT_BLUE = (173,216,230)
+
 # Screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 950
  
  
 class Player(pygame.sprite.Sprite):
@@ -47,13 +49,7 @@ class Player(pygame.sprite.Sprite):
         # Move up/down
         self.rect.y += self.change_y
     
-        # See if we are on the ground.
-        # if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
-        #     self.change_y = 0
-        #     self.rect.y = SCREEN_HEIGHT - self.rect.height
- 
-    
- 
+        
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
@@ -74,47 +70,34 @@ class Player(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
  
- 
+
 class Block(pygame.sprite.Sprite):
-    """ Platform the user can jump on """
- 
-    def __init__(self, width, height, terrain):
-        """ Platform constructor. Assumes constructed with user passing in
-            an array of 5 numbers like what's defined at the top of this code.
-            """
+    def __init__(self, width, height, terrain_color):
         super().__init__()
  
         self.image = pygame.Surface([width, height])
-        self.image.fill(terrain)
+
+        self.image.fill(terrain_color)
  
         self.rect = self.image.get_rect()
 
-        # self.rect_with_border = self.rect.copy()
-        # pygame.draw.rect(rect_with_border, (255, 0, 0), (0, 0, 47, 47), 2)
         
  
 class Map():
-    """ This is a generic super-class used to define a level.
-        Create a child class for each level with level-specific
-        info. """
- 
+    
     def __init__(self, player):
-        """ Constructor. Pass in a handle to player. Needed for when moving
-            platforms collide with the player. """
         self.block_list = pygame.sprite.Group()
         self.player = player
  
         self.world_shift_x = 0
         self.world_shift_y = 0
 
-    # Update everythign on this level
+    # Update everythign on this map
     def update(self):
-        """ Update everything in this level."""
         self.block_list.update()
         
     def draw(self, screen):
-        """ Draw everything on this level. """
- 
+    
         # Draw the background
         screen.fill(BLUE)
  
@@ -122,9 +105,7 @@ class Map():
         self.block_list.draw(screen)
  
     def shift_world(self, shift_x, shift_y):
-        """ When the user moves left/right and we need to scroll
-        everything: """
- 
+       
         # Keep track of the shift amount
         self.world_shift_x += shift_x
         self.world_shift_y += shift_y
@@ -135,7 +116,18 @@ class Map():
             block.rect.y += shift_y
         
  
-def cell_color(x, y):
+def cell_color(x, y, draw_path):
+    if draw_path:
+        for coordinate in paths:
+            if ((coordinate[0] == x and coordinate[1] == y) and (cell_color(x,y,False) != GREEN) and (cell_color(x,y,False) != RED)):
+                # draw_path = True
+                return YELLOW
+                # break
+            # else:
+            #     draw_path = False
+    # if draw_path == True:
+    #     old_color = cell_color(x, y, False) 
+    #     return YELLOW
     if x == start[0] and y == start[1]:
         return GREEN
     elif x == goal[0] and y == goal[1]:
@@ -148,12 +140,15 @@ def cell_color(x, y):
     elif terrain == '2':
         return GRAY
     else:
-        return BLUE
+        if terrain == 'a':
+            return LIGHT_BLUE
+        elif terrain == 'b':
+            return BLUE
 
 class current_map(Map):
     """ Definition for level 1. """
     
-    def __init__(self, player):
+    def __init__(self, player, draw_path, screen):
         """ Create level 1. """
  
         # Call the parent constructor
@@ -161,21 +156,22 @@ class current_map(Map):
  
         
         
-        cell_width = 20
-        cell_height = 20
+        cell_width = 8
+        cell_height = 8
 
-        # Go through the array above and add platforms
         for row in range(ROWS):
             for col in range(COLS):
-                block = Block(cell_width, cell_height, cell_color(col, row))
+                block = Block(cell_width, cell_height, cell_color(col, row, draw_path))
                 block.rect.x = cell_width * col
                 block.rect.y = cell_height * row
                 block.player = self.player
+                # line = pygame.Surface((cell_width, cell_height))
+                # pygame.draw.line(line, RED, (0, 0), (ROWS*COLS, ROWS*COLS), 5)
                 self.block_list.add(block)
             
  
  
-def draw_grid():
+def draw_grid(draw_path):
     """ Main Program """
     pygame.init()
  
@@ -188,7 +184,7 @@ def draw_grid():
     # Create the player
     player = Player()
  
-    map_to_draw = current_map(player)
+    map_to_draw = current_map(player, draw_path, screen)
  
     active_sprite_list = pygame.sprite.Group()
     player.map = map_to_draw
@@ -232,7 +228,7 @@ def draw_grid():
         # Update the player.
         active_sprite_list.update()
  
-        # Update items in the level
+        # Update items in the map
         map_to_draw.update()
  
         # If the player gets near the right side, shift the world left (-x)
@@ -266,13 +262,11 @@ def draw_grid():
  
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
  
-        # Limit to 60 frames per second
+        # Limit to 30 frames per second
         clock.tick(30)
  
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
  
-    # Be IDLE friendly. If you forget this line, the program will 'hang'
-    # on exit.
     pygame.quit()
  
