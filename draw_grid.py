@@ -276,4 +276,3 @@ def draw_grid():
     # on exit.
     pygame.quit()
  
-# draw_grid()
